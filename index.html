@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pádel Quest · Entrenador Nivel I</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0b1a2e; --court:#1453a3; --court2:#0f3f7d; --line:#e9f1ff; --ball:#d8f23a; --ball2:#b7d11c;
+  --card:#12253f; --card2:#183156; --txt:#eef4ff; --mut:#93a8c9; --ok:#33d17a; --ko:#ff5d5d; --warn:#ffb547;
+  --r:18px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--txt);font-family:Inter,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+body{min-height:100vh;background:
+  radial-gradient(1200px 600px at 50% -200px,#1b4f95 0%,transparent 60%),var(--bg)}
+#app{max-width:560px;margin:0 auto;padding:16px 14px 90px}
+h1,h2,h3,.disp{font-family:"Archivo Black",Inter,sans-serif;letter-spacing:.2px;margin:0}
+button{font:inherit;color:inherit;border:0;cursor:pointer}
+.top{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.ballic{width:38px;height:38px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#f4ff9a,var(--ball) 45%,var(--ball2));position:relative;flex:none;box-shadow:0 0 18px #d8f23a55}
+.ballic:before,.ballic:after{content:"";position:absolute;inset:4px;border:2px solid #ffffffcc;border-radius:50%;clip-path:inset(0 55% 0 0)}
+.ballic:after{clip-path:inset(0 0 0 55%)}
+.top h1{font-size:20px;line-height:1}
+.top small{color:var(--mut);font-size:12px}
+.pill{background:var(--card2);border-radius:999px;padding:6px 10px;font-size:13px;font-weight:600;display:inline-flex;gap:6px;align-items:center}
+.spacer{flex:1}
+.card{background:linear-gradient(180deg,var(--card2),var(--card));border:1px solid #ffffff10;border-radius:var(--r);padding:16px;margin-bottom:12px}
+.hero{background:linear-gradient(135deg,var(--court),var(--court2));position:relative;overflow:hidden}
+.hero:before{content:"";position:absolute;inset:10px;border:2px solid #ffffff30;border-radius:10px;pointer-events:none}
+.hero:after{content:"";position:absolute;left:50%;top:10px;bottom:10px;border-left:2px dashed #ffffff30}
+.hero > *{position:relative;z-index:1}
+.lvl{display:flex;justify-content:space-between;align-items:end;gap:8px}
+.lvl .name{font-size:22px}
+.bar{height:10px;background:#00000040;border-radius:99px;overflow:hidden;margin-top:8px}
+.bar > i{display:block;height:100%;background:linear-gradient(90deg,var(--ball2),var(--ball));border-radius:99px;transition:width .5s}
+.row{display:flex;gap:10px}
+.stat{flex:1;text-align:center;background:#00000030;border-radius:12px;padding:8px 4px}
+.stat b{display:block;font-size:20px;font-family:"Archivo Black"}
+.stat span{font-size:11px;color:#cfe0ff}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.mode{background:var(--card2);border:1px solid #ffffff12;border-radius:var(--r);padding:14px;text-align:left;min-height:112px;display:flex;flex-direction:column;gap:6px;transition:transform .12s}
+.mode:active{transform:scale(.97)}
+.mode .ic{font-size:26px}
+.mode b{font-size:15px;font-weight:800}
+.mode div,.mode small,.mode b{font-family:Inter,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+.mode small{color:var(--mut);font-size:12px;line-height:1.3}
+.mode.hl{grid-column:span 2;flex-direction:row;align-items:center;min-height:auto;background:linear-gradient(135deg,#d8f23a,#a9c814);color:#10220a}
+.mode.hl small{color:#2e4313}
+.sect{font-size:13px;text-transform:uppercase;letter-spacing:1.2px;color:var(--mut);margin:18px 4px 8px;font-weight:800}
+.tbar{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #ffffff0d;font-size:14px}
+.tbar:last-child{border:0}
+.tbar .nm{flex:1;min-width:0}
+.tbar .nm small{display:block;color:var(--mut);font-size:11px}
+.tbar .mini{width:90px;height:8px;background:#00000050;border-radius:9px;overflow:hidden}
+.tbar .mini i{display:block;height:100%}
+.tbar .pc{width:40px;text-align:right;font-weight:800}
+.btn{background:var(--ball);color:#132108;font-weight:800;border-radius:14px;padding:14px 18px;width:100%;font-size:16px}
+.btn.sec{background:var(--card2);color:var(--txt);border:1px solid #ffffff20}
+.btn.sm{padding:9px 12px;font-size:14px;width:auto;border-radius:11px}
+.back{background:transparent;color:var(--mut);font-weight:600;padding:6px 0}
+.q{font-size:19px;line-height:1.35;font-weight:600;margin:6px 0 14px}
+.tag{display:inline-block;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:var(--ball);background:#d8f23a18;border-radius:6px;padding:3px 7px}
+.opt{display:block;width:100%;text-align:left;background:var(--card2);border:2px solid #ffffff14;border-radius:14px;padding:13px 14px;margin-bottom:9px;font-size:15px;line-height:1.35;transition:all .15s}
+.opt:active{transform:scale(.99)}
+.opt.ok{border-color:var(--ok);background:#33d17a22}
+.opt.ko{border-color:var(--ko);background:#ff5d5d22}
+.opt.dim{opacity:.45}
+.exp{background:#00000035;border-left:4px solid var(--ball);border-radius:10px;padding:12px;font-size:14px;line-height:1.45;margin:10px 0}
+.exp.bad{border-color:var(--ko)}
+.hud{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.prog{flex:1;height:8px;background:#ffffff14;border-radius:9px;overflow:hidden}
+.prog i{display:block;height:100%;background:var(--ball);transition:width .3s}
+.combo{font-weight:800;color:var(--ball)}
+.flip{perspective:1200px;margin-bottom:12px}
+.fc{position:relative;min-height:260px;transition:transform .5s;transform-style:preserve-3d}
+.fc.on{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;overflow:auto;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:var(--r);padding:20px;display:flex;flex-direction:column;justify-content:center;background:linear-gradient(160deg,var(--court),var(--court2));border:1px solid #ffffff25}
+.face.b{transform:rotateY(180deg);background:linear-gradient(160deg,#1e3a62,#132a49)}
+.face .q{font-size:20px}
+.face .hint{color:#cfe0ff;font-size:13px;margin-top:auto}
+.rate{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.rate button{border-radius:12px;padding:10px 2px;font-weight:800;font-size:12px;line-height:1.2}
+.r0{background:#ff5d5d33;border:1px solid var(--ko)!important}
+.r1{background:#ffb54733;border:1px solid var(--warn)!important}
+.r2{background:#33d17a33;border:1px solid var(--ok)!important}
+.r3{background:#d8f23a33;border:1px solid var(--ball)!important}
+.rate small{display:block;font-weight:600;opacity:.75;font-size:10px}
+.tf{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tf button{padding:22px 0;border-radius:16px;font-size:18px;font-weight:800}
+.tf .t{background:#33d17a2a;border:2px solid var(--ok)}
+.tf .f{background:#ff5d5d2a;border:2px solid var(--ko)}
+.timer{font-family:"Archivo Black";font-size:22px;min-width:50px;text-align:right}
+.seqi{display:flex;align-items:center;gap:10px;background:var(--card2);border:2px solid #ffffff14;border-radius:13px;padding:12px;margin-bottom:8px;width:100%;text-align:left;font-size:15px}
+.seqi .n{width:28px;height:28px;border-radius:50%;background:#ffffff14;display:grid;place-items:center;font-weight:800;flex:none}
+.seqi.done{border-color:var(--ok);background:#33d17a1a}
+.seqi.done .n{background:var(--ok);color:#06210f}
+.shake{animation:sh .35s}
+@keyframes sh{20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.mgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.mt{background:var(--card2);border:2px solid #ffffff14;border-radius:12px;padding:10px;font-size:13px;line-height:1.3;min-height:64px;text-align:left}
+.mt.sel{border-color:var(--ball);background:#d8f23a1c}
+.mt.gone{opacity:.15;pointer-events:none}
+.mt.bad{border-color:var(--ko)}
+.score{display:flex;justify-content:center;gap:14px;align-items:center;margin:4px 0 12px}
+.score .sc{background:#0006;border-radius:14px;padding:10px 16px;text-align:center;min-width:110px}
+.score .sc b{font-family:"Archivo Black";font-size:34px;display:block;line-height:1}
+.score .sc small{color:var(--mut);font-size:12px}
+.score .vs{color:var(--mut);font-weight:800}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.chip{background:var(--card2);border:1px solid #ffffff20;border-radius:999px;padding:7px 11px;font-size:13px;font-weight:600}
+.chip.on{background:var(--ball);color:#132108;border-color:var(--ball)}
+.badge{display:flex;gap:10px;align-items:center;padding:8px 0;font-size:14px}
+.badge .bi{font-size:26px;width:40px;text-align:center}
+.badge.off{opacity:.35;filter:grayscale(1)}
+.badge small{display:block;color:var(--mut);font-size:12px}
+.mn{border-left:4px solid var(--ball);padding:10px 12px;background:#0003;border-radius:10px;margin-bottom:10px;font-size:14px;line-height:1.45}
+.mn b{color:var(--ball)}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(120px);background:var(--ball);color:#132108;font-weight:800;border-radius:14px;padding:12px 18px;transition:transform .35s,opacity .35s;opacity:0;z-index:9;box-shadow:0 10px 30px #0008;max-width:90vw;text-align:center}
+.toast.on{transform:translateX(-50%) translateY(0);opacity:1}
+.ring{width:64px;height:64px;flex:none}
+.center{text-align:center}
+.big{font-size:44px;font-family:"Archivo Black";line-height:1}
+.mut{color:var(--mut)}
+.weak{display:flex;gap:8px;align-items:center;background:#ff5d5d18;border:1px solid #ff5d5d55;border-radius:12px;padding:10px;margin-bottom:8px;font-size:14px}
+.conf{display:flex;gap:8px;align-items:center;margin-bottom:12px;font-size:13px;color:var(--mut)}
+.sw{width:44px;height:26px;border-radius:99px;background:#ffffff22;position:relative;flex:none;transition:background .2s}
+.sw:after{content:"";position:absolute;width:20px;height:20px;border-radius:50%;background:#fff;top:3px;left:3px;transition:left .2s}
+.sw.on{background:var(--ball)}
+.sw.on:after{left:21px}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div class="toast" id="toast"></div>
+<script>
+/* =========================================================
+   CONTENIDO — extraído de:
+   ÁREA 2: Perfeccionamiento técnico y táctico (G. Moyano)
+   ÁREA 3: Didáctica para las sesiones de pádel (G. Moyano)
+   ========================================================= */
+const TOPICS = [
+ {id:"emp",n:"Técnica y empuñaduras",ic:"🤚",a:2},
+ {id:"fas",n:"Juego de pies y fases de golpeo",ic:"👟",a:2},
+ {id:"reb",n:"Rebotes y efectos",ic:"🔁",a:2},
+ {id:"gol",n:"Los golpes",ic:"🎾",a:2},
+ {id:"tac",n:"Táctica y aplicaciones",ic:"🧠",a:2},
+ {id:"pri",n:"Principios, zonas y factores",ic:"🗺️",a:2},
+ {id:"par",n:"Partido y progresión en menores",ic:"🏆",a:2},
+ {id:"met",n:"Marcos metodológicos",ic:"📚",a:3},
+ {id:"fap",n:"Método FAP y corrección",ic:"🧑‍🏫",a:3},
+ {id:"ent",n:"Niveles, sistemas y lanzamiento",ic:"🧺",a:3},
+ {id:"eje",n:"Ejercicios y progresiones",ic:"🧩",a:3},
+ {id:"ses",n:"Juegos y sesión",ic:"⏱️",a:3}
+];
+const TN = Object.fromEntries(TOPICS.map(t=>[t.id,t]));
+
+// [tema, pregunta, respuesta correcta, [distractores], explicación]
+const RAW = [
+// ---------- EMPUÑADURAS / TÉCNICA
+["emp","¿Cuáles son los tres componentes generales de la técnica?","Fluidez, economía y eficacia",["Fuerza, velocidad y precisión","Empuñadura, juego de pies e impacto","Control, dirección y profundidad"],"Fluidez o naturalidad (amoldarse a las fuerzas), economía o eficiencia energética, y eficacia (aprovechar la técnica a nivel táctico). Truco: «FEE»."],
+["emp","¿Por qué es fundamental automatizar la técnica de manera correcta?","Deja libre el nivel cognitivo para otros aspectos como la táctica",["Permite golpear con más potencia","Evita tener que calentar","Permite cambiar de empuñadura en cada golpe"],"Si el gesto está automatizado, la cabeza queda libre para pensar el juego (táctica)."],
+["emp","Las empuñaduras del pádel se asemejan más a las del…","Tenis de la década de los 70",["Tenis actual","Bádminton","Squash"],"El manual remarca que el agarre del tenis actual es muy distinto al recomendado en pádel."],
+["emp","¿Qué empuñadura se usa para la gran mayoría de los golpes?","Continental",["Este de derecha","Este de revés","Oeste"],"La continental permite todo tipo de golpes porque la muñeca tiene más movilidad."],
+["emp","¿Cuál es el inconveniente de la empuñadura continental?","Requiere una fuerza considerable en la muñeca",["No permite hacer voleas","Limita la movilidad de la muñeca","Solo sirve para golpes de pared"],"Por eso con niños o adultos con poca fuerza se empieza con otras empuñaduras."],
+["emp","En iniciación, con niños o adultos con poca fuerza en la muñeca, ¿qué empuñaduras se usan?","Este de derecha, revés a dos manos o este de revés",["Continental en todos los golpes","Oeste para todos los golpes","Solo revés a dos manos"],"Favorecen la transferencia de fuerza al haber más apoyo de la mano. Cuando la muñeca gane destreza y fuerza → pasar a continental."],
+["emp","Las distintas empuñaduras se basan en…","La mayor o menor rotación del mango dentro de la mano",["La longitud del agarre en el mango","El número de dedos que sujetan la pala","El peso de la pala"],"La rotación del mango cambia la inclinación del plano de impacto; para definirlas se mencionan las aristas (zonas) del mango."],
+["emp","Empuñadura CONTINENTAL: ¿dónde va la zona hipotenar y la base del índice?","Entre la zona 1 y la zona 2; pulgar en la parte superior de la zona 4",["En la zona 2; pulgar en la zona 4","En la zona 1; pulgar en la zona 3","Entre la zona 3 y la zona 4; pulgar en la zona 1"],"Continental = entre 1 y 2. Este de derecha = zona 2. Este de revés = zona 1."],
+["emp","Empuñadura ESTE DE DERECHA: ¿dónde se coloca la mano?","Zona hipotenar en zona 2 (cara derecha); pulgar en zona 4 (cara izquierda)",["Entre zona 1 y 2; pulgar arriba de la zona 4","Zona 1 (plano superior); pulgar en zona 3","Zona 3; pulgar en zona 1"],"Este de derecha → «2 y 4»."],
+["emp","Empuñadura ESTE DE REVÉS: ¿dónde se coloca la mano?","Zona hipotenar en zona 1 (plano superior); pulgar en zona 3 (plano inferior)",["Zona 2; pulgar en zona 4","Entre zona 1 y 2; pulgar en zona 4","Zona 4; pulgar en zona 2"],"Este de revés → «1 y 3»."],
+["emp","Si es necesario un cambio de empuñadura durante la enseñanza…","Debe ser paulatino y controlado permanentemente por el monitor",["Se hace de golpe en una sola sesión","Se deja que el alumno lo decida solo","Nunca se debe cambiar"],"Los cambios de empuñadura son muy difíciles de lograr; el éxito de un golpe se decide desde el inicio por cómo se coge la pala."],
+// ---------- JUEGO DE PIES / FASES
+["fas","¿Cuál es el orden correcto de las fases de golpeo?","Espera → Preparación → Avance → Impacto → Terminación",["Preparación → Espera → Impacto → Avance → Terminación","Espera → Avance → Preparación → Impacto → Terminación","Preparación → Avance → Impacto → Espera → Terminación"],"Truco: «En Pádel Ataco, Impacto y Termino» (E-P-A-I-T)."],
+["fas","¿Qué golpes NO siguen exactamente los mismos pasos de las fases de golpeo?","El servicio y el remate",["La volea y el globo","El resto y la derecha","Los rebotes de fondo"],"Todos los golpes básicos (con o sin rebote) tienen los mismos pasos, exceptuando servicio y remate."],
+["fas","¿Cómo se define el juego de pies?","Posiciones y movimientos de los pies en relación con la pelota y el golpe a realizar",["La velocidad máxima de desplazamiento del jugador","La distancia entre los pies en el impacto","El salto previo al remate"],"Permite colocarse correctamente y recuperar la posición inicial rápido."],
+["fas","Posición de espera para golpes de fondo (derecha/revés):","Pies separados a la anchura de los hombros y peso repartido en ambas plantas",["Pies juntos y peso en los talones","Pies muy separados y peso en el pie trasero","De lado a la red con pies alineados"],"En voleas y remates los pies se separan algo más y el peso va a la parte delantera."],
+["fas","¿Dónde se coloca el jugador para restar o para golpes de pared lateral?","Detrás de la línea de fondo, más cerca de la pared lateral que del centro",["En el centro del recuadro de servicio","Pegado a la red","Sobre la línea de saque en el centro"],"De frente a la red, ligeramente orientado hacia donde viene la pelota."],
+["fas","Posición de los pies en el servicio:","Pie trasero paralelo a la línea de fondo y pie delantero apuntando al poste del lado de la pala",["Ambos pies paralelos a la red","Pie delantero paralelo a la línea de fondo","Pies juntos mirando al centro"],"El servicio se prepara detrás de la línea de fondo, de lado, orientado al recuadro de resto."],
+["fas","Posición de espera en volea y remate respecto a los golpes de fondo:","Pies algo más separados, peso en la parte delantera y cuerpo inclinado hacia delante",["Pies juntos y peso en los talones","Exactamente igual que en fondo","De lado a la red con pala atrás"],"Más dinámica para reaccionar en la red."],
+["fas","¿Cómo debe ser el avance hacia la pelota?","Pasos cortos y rápidos, parando con el pie trasero y ajustando con el delantero",["Pasos largos y lentos","Saltos laterales","Carrera frontal hasta el impacto"],"Al parar, el peso se equilibra entre ambos pies a la anchura de los hombros."],
+["fas","Al subir a la red, ¿qué se hace cuando el contrario golpea?","Parar de frente (split step)",["Seguir corriendo hasta la red","Ponerse de lado","Saltar hacia atrás"],"Para subir: pasos más largos y rápidos, y split step cuando golpea el rival."],
+["fas","Al retroceder hacia la pared de fondo desde la red:","Se corre de frente y a unos 2-3 metros del golpe se alinean los pies",["Se corre de espaldas toda la distancia","Se va de lado desde el principio","Se espera quieto a que rebote"],"La carrera empieza de frente; el alineamiento llega al final."],
+["fas","En la preparación de golpes de fondo sin rebote, voleas y restos, el primer paso es…","Adelantar el pie necesario para colocarse de lado",["Atrasar el pie","Dar un salto","Girar 360º"],"En remate, rebotes de fondo y dobles rebotes se ATRASA el pie. En rebotes laterales: pequeña rotación."],
+["fas","¿En qué golpes se ATRASA el primer pie en la preparación?","Remate, rebotes de fondo y dobles rebotes",["Voleas y restos","Derecha y revés sin rebote","Servicio y globo"],"Adelantar: fondo sin rebote, voleas, restos. Atrasar: remate, rebote de fondo, doble rebote."],
+["fas","Impacto en golpes de fondo (derecha, revés, saque):","A la altura de la cintura, cara ligeramente abierta y cabeza de la pala a la altura del puño",["A la altura del pecho con cara cerrada","Por encima de la cabeza","A la altura de la rodilla con cara muy abierta"],"La cara ligeramente abierta da más control, precisión y salida correcta."],
+["fas","¿A qué altura se impacta la volea?","Sobre el pecho",["A la altura de la cintura","A la altura de la rodilla","Por encima de la cabeza"],"El brazo está menos extendido, por eso la pala queda más alta."],
+["fas","En la preparación del remate, cuando el codo llega a la altura del hombro se denomina…","El «3 en 1»",["El bucle","El split step","El swing"],"Brazo flexionado con la pala detrás de la cabeza y brazo-bola apuntando a la pelota."],
+["fas","En la volea de derecha, en el impacto, brazo y pala forman un ángulo de…","90 grados",["45 grados","180 grados","120 grados"],"Impacto en la línea del pie adelantado, a la altura del pecho."],
+["fas","¿Cómo es la terminación (acompañamiento) de la volea?","De arriba hacia abajo y hacia delante",["De abajo hacia arriba","Recta de atrás adelante","Larga por encima de la cabeza"],"Globo: de abajo a arriba. Remate: más arriba-abajo que adelante. Fondo: recto atrás-adelante."],
+["fas","¿En qué golpes la terminación NO acaba en mitad del cuerpo a la altura del pecho?","Remate y globo",["Volea y resto","Derecha y revés","Servicio y rebote lateral"],"La terminación debe ser corta salvo en el globo; en el globo es larga y acaba por encima de la cabeza."],
+["fas","En el servicio, el codo flexionado hace que el brazo forme…","Una «V»",["Una «L»","Una línea recta","Una «X»"],"La pala va detrás del hombro que golpea; el brazo-bola estirado a la altura de la cabeza."],
+// ---------- REBOTES Y EFECTOS
+["reb","¿Qué diferencia principalmente al pádel de deportes como tenis o squash?","Los rebotes en paredes y vallas (incluso giros de 360º)",["El tamaño de la pelota","El sistema de puntuación","El uso de raqueta"],"La estructura de la pista hace que haya multitud de rebotes."],
+["reb","Fundamento técnico básico del rebote en pared de fondo:","Colocarse siempre detrás de la pelota para impactar delante del cuerpo",["Pegarse al cristal y esperar","Golpear antes de que toque el cristal","Colocarse delante de la pelota"],"Excepto en la contrapared y golpes especiales."],
+["reb","Fundamento del rebote en pared lateral:","Detrás de la pelota, impacto delante del cuerpo y en el mismo ángulo con el que rebota",["Golpear siempre de revés","Pegarse a la pared lateral","Impactar al lado del cuerpo"],"Hay que leer el ángulo de salida del cristal."],
+["reb","¿Cómo hay que actuar ante un rebote en la valla/malla?","De lado, pala sin ir más atrás del hombro y golpe rápido y corto",["Preparación larga y golpe potente","Esperar al segundo bote","Siempre golpear de remate"],"El rebote de malla es impredecible (material, soldadura, efecto). Carácter defensivo."],
+["reb","¿Qué es el efecto?","La rotación que se imprime a la pelota en el momento del impacto",["La velocidad de salida de la pelota","El ángulo del rebote en el cristal","La altura del bote"],"Los dos efectos principales: cortado y liftado (se profundiza en Nivel II)."],
+["reb","Efecto CORTADO:","Rotación hacia atrás; al botar se desliza con poca altura",["Rotación hacia delante; bota más alto","Sin rotación","Rotación lateral; cambia de dirección"],"Más difícil de devolver por la escasa altura. Se usa a nivel medio/perfeccionamiento."],
+["reb","Efecto LIFTADO:","Rotación hacia delante; cae más rápido y puede botar más alto",["Rotación hacia atrás; se desliza","Sin rotación, rebote plano","Rotación hacia atrás; bota alto"],"Ángulo de incidencia más pronunciado y de reflexión más amplio."],
+["reb","¿Por qué se usa el cortado a nivel medio y perfeccionamiento?","Permite controlar la potencia y variar dirección, altura y velocidad",["Porque es el efecto más fácil de aprender","Porque da más potencia al remate","Porque evita los rebotes"],"Dificulta la devolución del rival, con o sin rebote."],
+["reb","Doble rebote LATERAL-FONDO (primero lateral, luego fondo) también se conoce como…","El doble rebote que abre",["El doble rebote que cierra","La contrapared","El giro"],"La pelota sale hacia el centro y el jugador se ALEJA del cristal lateral."],
+["reb","Doble rebote FONDO-LATERAL (primero fondo, luego lateral) también se conoce como…","El doble rebote que cierra",["El doble rebote que abre","La bajada de pared","La chiquita"],"La pelota sale hacia delante y el jugador se ACERCA al cristal lateral."],
+["reb","¿Cuándo se produce un rebote de fondo?","Cuando la pelota bota sobre la línea de saque o detrás, sin espacio ni tiempo para el golpe habitual",["Cuando la pelota bota cerca de la red","Solo después de un remate","Cuando el rival juega una dejada"],"Dejarla rebotar da más tiempo de reacción y espacio para golpear."],
+["reb","¿Cuándo se usa el giro en rebote de fondo?","Cuando la pelota viene en diagonal directamente hacia el jugador",["Cuando la pelota viene por el centro y alta","Cuando el rival está en el fondo","Siempre tras un globo"],"Evita un desplazamiento muy amplio que abriría espacios en la pareja."],
+["reb","¿Qué carácter táctico tiene el golpe tras rebote en valla lateral?","Fundamentalmente defensivo",["Siempre de ataque","Siempre ganador","De construcción obligatoria"],"La salida es imprevisible; si sale favorable, puede ser constructivo o incluso de ataque."],
+// ---------- GOLPES
+["gol","¿Cuál es el único golpe en el que el jugador se lanza la pelota?","El servicio",["El remate","El globo","El resto"],"Pone el punto en juego y da la iniciativa para ganar la red."],
+["gol","¿Dónde debe botar el servicio?","En diagonal, en el recuadro de recepción del servicio contrario",["En paralelo, en cualquier zona","Detrás de la línea de fondo rival","En el propio campo antes de pasar"],"Puede rebotar en el cristal antes de que el restador la golpee."],
+["gol","Objetivo principal del resto:","No fallar y no dejar un golpe fácil a los contrarios (que estarán en zona de ataque)",["Ganar el punto directamente","Golpear siempre con potencia","Hacer siempre un globo"],"Se golpea tras botar en el recuadro, normalmente desde la zona de defensa."],
+["gol","¿Por qué no se debe retrasar la enseñanza del remate en iniciación?","Porque más adelante habría carencias técnicas y tácticas",["Porque es el golpe más fácil","Porque no necesita técnica","Porque sustituye a la volea"],"Es complicado (muchas palancas, golpe aéreo) pero debe estar en el repertorio de iniciación."],
+["gol","¿Qué busca fundamentalmente el globo?","Altura media, poco rebote en campo contrario y dirección cruzada",["Máxima altura y mucho bote","Dirección paralela y potencia","Golpear a los pies del rival"],"Sirve para hacer retroceder al contrario a posiciones defensivas."],
+["gol","¿Por qué es mejor el globo cruzado?","Hay más distancia en diagonal y se reduce el margen de error",["Porque es más rápido","Porque obliga a jugar de volea","Porque pasa por la parte alta de la red"],"Además favorece rebotes en el rincón."],
+["gol","Error al enseñar el globo:","Enseñarlo precipitadamente antes de consolidar el patrón técnico de derecha",["Enseñarlo en iniciación","Enseñarlo con pala","Enseñarlo cruzado"],"Hay que diferenciar el patrón de derecha del de globo."],
+["gol","¿Cuál es la zona de ataque donde se hace la volea?","Desde la red hasta unos tres metros",["Desde la línea de saque hasta el fondo","El recuadro de servicio","Entre la red y la línea de saque completa"],"Allí se construye y se finaliza el punto."],
+["gol","Objetivo táctico de la volea alta:","Salir de una situación comprometida sin perder la red y manteniendo al rival en defensa",["Ganar siempre el punto","Hacer que el rival suba a la red","Retroceder al fondo"],"Es un golpe defensivo-constructivo."],
+["gol","La volea baja se realiza cuando la pelota llega…","De la cintura hacia abajo",["Por encima de la cabeza","A la altura del pecho","Después de botar"],"La cara de la pala va más abierta que en una volea habitual."],
+["gol","Terminación de la volea: ¿dónde queda la pala?","A la altura del pecho y por encima de la altura de la red",["Por debajo de la rodilla","Por encima de la cabeza","Detrás de la espalda"],"Brazos semiflexionados, listos para el siguiente golpe."],
+["gol","Terminación del globo:","Larga, con la cabeza de la pala por encima de la cabeza y la punta hacia el cielo",["Corta a la altura del pecho","Hacia el suelo","Lateral a la altura de la cintura"],"Acompañamiento de abajo arriba, controlando la cara abierta."],
+["gol","Impacto del remate:","Brazo totalmente extendido, punta de la pala al cielo, delante del cuerpo",["Codo flexionado a la altura del pecho","Detrás de la cabeza","A la altura de la cintura"],"El cuerpo gira y queda de frente a la red."],
+["gol","Posición de espera del resto respecto a los golpes de fondo:","Piernas más flexionadas, pies algo más separados y cerca de la pared lateral",["Igual que en fondo, en el centro","Pegado a la red","De lado con la pala arriba"],"Mirada hacia el servidor."],
+["gol","En los golpes de revés, la mano-pelota…","Sujeta la pala por el cuello para ayudar en la preparación y el avance",["Apunta a la pelota","Se queda detrás de la espalda todo el golpe","Sujeta la muñeca"],"En la derecha, la mano-pelota apunta a la pelota para equilibrio y referencia."],
+["gol","La derecha en iniciación sirve sobre todo para asimilar…","La situación táctica desde la zona defensiva (recuadro de servicio)",["El remate por 3","La bandeja","La contrapared"],"Más adelante sirve para construir y atacar el juego de red."],
+// ---------- TÁCTICA
+["tac","¿Cómo se define la táctica?","Acciones organizadas y ordenadas para conseguir la victoria",["El conjunto de golpes de un jugador","La preparación física del partido","Las reglas del juego"],"También: habilidad para usar capacidades técnicas, físicas y psicológicas de forma inteligente para ganar."],
+["tac","Relación entre estrategia y táctica:","La táctica es la parte práctica o ejecutoria de la estrategia",["La estrategia es parte de la táctica","Son exactamente lo mismo","La táctica es la parte física"],"Ej.: Estrategia = jugar defensivo → Táctica = sistemas defensivos → Técnica = globos."],
+["tac","Ejemplo del manual: si la estrategia es «jugar defensivamente», la técnica sería…","Jugar con golpes de globo",["Rematar por 3","Subir siempre a la red","Jugar al cuerpo"],"Estrategia → Táctica → Técnica."],
+["tac","¿En qué orden se enseña el juego tácticamente?","Primero la defensa, luego construcción y ataque/contraataque",["Primero el ataque","Todo a la vez","Primero el contraataque"],"La adecuación de objetivos tácticos es progresiva."],
+["tac","Fases de la acción táctica:","Percepción y análisis → Toma de decisión → Solución motriz",["Toma de decisión → Percepción → Ejecución","Solución motriz → Análisis → Decisión","Observación → Golpe → Recuperación"],"Truco: «PDS» = Percibo, Decido, Soluciono. El feedback cierra el ciclo."],
+["tac","¿Qué juega un papel importante en la fase de percepción y análisis?","La memoria",["La fuerza","La empuñadura","El material"],"Datos previos del rival, de uno mismo, trayectoria, pista, clima…"],
+["tac","¿Qué influye en la solución motriz?","Coordinación, técnica, condición física y preparación mental",["Solo la experiencia","Solo la memoria","El reglamento"],"Percepción y decisión son nivel cognitivo; la solución motriz es nivel motriz."],
+["tac","Orden de las aplicaciones tácticas (de menor a mayor dificultad):","Control → Dirección → Profundidad → Altura → Velocidad → Potencia",["Potencia → Velocidad → Control → Dirección","Dirección → Control → Altura → Profundidad","Control → Potencia → Dirección → Velocidad"],"Truco: «Cada Día Practico Algo: Velocidad y Potencia»."],
+["tac","¿Cuál es la primera aplicación táctica a trabajar?","El control",["La dirección","La potencia","La profundidad"],"Pasar la bola al otro campo dentro de los límites; empezar de derecha a derecha con un cono."],
+["tac","Dirección PARALELA: característica principal:","Menos metros y más sorpresa, pero la red está más alta (más riesgo)",["Más distancia y red más baja","La zona más segura","Genera confusión entre los rivales"],"Se usa más para ganar el punto."],
+["tac","Dirección CRUZADA: característica principal:","Red más baja y más distancia: más segura y rebotes más difíciles",["Red más alta y menos distancia","Siempre da el punto","Sin rebotes"],"El rival tiene más tiempo, pero la defensa de los rebotes es más complicada."],
+["tac","Dirección al MEDIO:","Zona segura y efectiva que genera confusión entre los rivales",["La más arriesgada","Siempre sorprende","Facilita los rebotes difíciles"],"Si se repite mucho, el rival se anticipa. Mejor con poco rebote y velocidad baja."],
+["tac","¿Con qué NO hay que confundir la profundidad?","Con la velocidad o fuerza del golpe",["Con el control","Con la dirección cruzada","Con el efecto liftado"],"Golpear fuerte puede hacer que rebote mucho y facilitar la defensa rival."],
+["tac","¿Qué es la «chiquita»?","Una bola a los pies de los contrarios cuando están en la red",["Un globo corto","Un remate suave","Una dejada desde la red"],"Permite buscar el contraataque o dificultar la devolución."],
+["tac","¿Cómo se define la potencia?","Capacidad para vencer una resistencia mediante alta velocidad de contracción",["Golpear siempre lo más fuerte posible","Jugar con mucho efecto","Mantener el ritmo"],"También es importante saber manejar la baja potencia."],
+// ---------- PRINCIPIOS / ZONAS / FACTORES
+["pri","¿Qué significa ENF?","Errores no forzados",["Errores necesarios forzados","Ejercicios no formales","Entrenamiento neuro-funcional"],"Son puntos gratis para el rival: falla en posición cómoda sin presión."],
+["pri","Según el principio «controlar el juego»:","Es preferible buscar el fallo del rival antes que arriesgar",["Hay que buscar siempre el golpe espectacular","Hay que arriesgar en los primeros puntos","Hay que jugar paralelo siempre"],"Vale lo mismo un punto espectacular que un ENF del rival."],
+["pri","¿Por qué se busca ganar la red?","La pareja que está más tiempo en la red tiene más opciones de ganar",["Porque es más cómodo","Porque se cansa menos","Porque el reglamento lo exige"],"Desde la red llegan bolas por encima de la cintura: más golpes constructivos y ganadores."],
+["pri","¿Cuál es el primer momento natural para subir a la red?","Después del saque",["Después del resto","Tras un globo del rival","Al cambiar de lado"],"El compañero del sacador ya está en la zona de ataque."],
+["pri","¿Qué dice la «teoría de la cuerda» o del limpiaparabrisas?","La pareja se desplaza unida manteniendo siempre la misma distancia",["Cada jugador cubre solo su mitad","Uno sube y el otro se queda","Se juega escalonado"],"Jugar en línea, no escalonados; más importante aún en la red."],
+["pri","Volea de revés forzada en el lado de revés: ¿a dónde jugarla?","En paralelo o, en último caso, al medio",["Cruzada siempre","Globo al centro","Contra la valla"],"Jugarla cruzada abriría espacio libre en el medio."],
+["pri","¿Cuáles son las tres zonas tácticas de la pista?","Defensiva, constructiva y de ataque",["Fondo, centro y red","Derecha, centro y revés","Inicio, transición y final"],"Defensiva (fondo), constructiva (línea de saque–red), ataque (red y 2-3 m)."],
+["pri","¿Por qué la zona constructiva es peligrosa?","Es fácil errar al forzar golpes arriesgados lejos de la red",["Porque no se puede volear","Porque hay rebotes de malla","Porque está prohibido rematar"],"Allí: voleas a media pista, bandejas, bote-prontos con control, sin buscar ganadores."],
+["pri","¿Qué golpes predominan en la zona defensiva?","Golpes defensivos, sobre todo globos",["Remates potentes","Voleas de ataque","Dejadas"],"Objetivo: hacer retroceder al rival y ganar la red lo antes posible."],
+["pri","Particularidades de la pista de muro:","Altura lateral de 3 o 4 m y puede tener quicio o «pico»",["Siempre 3 m y valla rígida","Tiene puertas para salir","Siempre rebota igual"],"El muro rugoso hace que la pelota salga menos."],
+["pri","¿Por qué en pista de cristal siempre se puede rematar por tres?","Porque siempre tiene 3 metros",["Porque el cristal es más rápido","Porque no tiene valla","Porque tiene puertas"],"Su valla es rígida, difícil de vencer, y su rebote más difícil de prever."],
+["pri","Orientación reglamentaria de la pista:","Eje longitudinal Norte-Sur (variación entre N-NE y N-NO)",["Este-Oeste","Cualquier orientación","Noreste-Suroeste fija"],"Es la que menos tiempo molesta el sol."],
+["pri","Viento EN CONTRA: ¿cómo se tira el globo?","Con más fuerza",["Con más suavidad","No se tira nunca","Con efecto cortado"],"A favor: más suave para que no se lo lleve el viento."],
+["pri","Sol de cara al recibir un globo:","Mejor dejar botar y devolver de pared que rematar sin ver",["Rematar siempre","Cerrar los ojos","Jugar de volea alta"],"Si el rival tiene el sol de cara, lánzale globos."],
+["pri","Con humedad o lluvia en pista de cristal:","Jugar lo menos posible con la pared y golpear más plano",["Buscar siempre la pared","Jugar con mucho efecto","Tirar más globos altos"],"El cristal resbala, la bola pesa más y se adhiere menos a la pala."],
+["pri","Con lluvia, ¿qué pasa con las bolas y la pista?","Las bolas pesan más y la pista se vuelve más rápida",["Las bolas son más ligeras","La pista es más lenta","No cambia nada"],"Hay que sujetar más la pala y golpear centrado."],
+["pri","¿Qué golpes se usan habitualmente para construir/contraatacar?","Voleas y bandejas",["Globos","Remates ganadores","Restos"],"Defensivo = globo; construcción = voleas y bandejas; ganador = remate."],
+["pri","Golpe ganador típico:","Remate ganador",["Globo","Bloqueo de volea","Resto"],"También se puede acabar con volea o bajada de pared."],
+// ---------- PARTIDO / MENORES
+["par","Progresión táctica 7-8 años:","Jugar de forma segura y defensiva; inculcar el juego en pareja",["Velocidad y potencia","Efectos y ataque","Tácticas de partido"],"Truco por edades: 7-8 Seguro · 9-10 Dirección · 11-12 Velocidad · 13-14 Variar · 15-18 Competir."],
+["par","Progresión táctica 9-10 años:","Ángulos, paralelo y cruzado, dirección y profundidad, subir a la red",["Juego ofensivo y patrón","Efectos","Solo defender"],"Se empieza a jugar subiendo a la red."],
+["par","Progresión táctica 11-12 años:","Velocidad y potencia, tomar decisiones, debilidades del rival, jugar en línea",["Juego seguro y defensivo","Desarrollo del patrón de competición","Solo dirección"],"Aparece la toma de decisiones."],
+["par","Progresión táctica 13-14 años:","Variar la velocidad, efectos y juego de ataque, flexibilidad",["Juego en pareja básico","Ángulos básicos","Defensa segura"],"Versatilidad en el juego."],
+["par","Progresión táctica 15-18 años:","Juego ofensivo, patrón de juego, competición y tácticas de partido",["Juego seguro defensivo","Paralelo y cruzado","Inculcar la pareja"],"Adaptación a las circunstancias del partido."],
+["par","Ejemplo de objetivo TÁCTICO de partido según el manual:","Ganar la red restando en menos de tres golpes",["Ganar un set","No protestar en voz alta","No dejar botar los globos"],"Resultado = ganar set; psicológico = no protestar; físico = no dejar botar el globo."],
+["par","Ejemplo de objetivo PSICOLÓGICO:","No perder el control ni protestar un punto perdido en voz alta",["Ganar el partido","Trabajar el cortado","Rematar sin dejar botar"],"Se trabaja un aspecto mental."],
+["par","Si la táctica principal funcionó un tiempo pero ahora se pierde CLARAMENTE:","Cambiar a una o varias tácticas secundarias",["No cambiar nada","Medida arriesgada radical","Abandonar el partido"],"Si el partido solo se iguala → seguir mejorando concentración."],
+["par","Si la táctica principal funcionó y el partido se IGUALA:","Seguir el planteamiento mejorando concentración y aplicación",["Cambiar radicalmente","Pasar a secundarias","Arriesgar todo"],"Cualquier variación puede inclinar el partido."],
+["par","Si fallan la principal y las secundarias y el resultado es claramente en contra:","Usar una medida arriesgada, totalmente diferente",["Seguir igual","Volver a la principal","Jugar más lento siempre"],"Buscar un cambio radical del resultado."],
+["par","Tras un fallo grave nuestro, el manual recomienda…","Mantener la calma",["Presionar más rápido","Arriesgar el siguiente punto","Protestar"],"Tras un error no forzado de los contrarios: presionar rápido en el siguiente punto."],
+["par","Momentos importantes del partido a vigilar:","Primeros juegos de cada set, las ventajas y los primeros puntos de cada juego",["Solo el último juego","Los cambios de lado","El calentamiento"],"Incluso cuando la táctica funciona."],
+["par","Criterios para elegir pareja:","Amistad/parentesco, objetivos comunes, nivel parecido y complementario, comunicación",["Solo el nivel más alto posible","Que juegue en el mismo lado","Que sea de la misma edad"],"Con menos nivel se pueden flexibilizar los criterios."],
+// ---------- MÉTODOS
+["met","¿Qué es un método?","Todo procedimiento estructurado para conseguir un fin u objetivo",["Un tipo de ejercicio","Una sesión de entrenamiento","Una progresión técnica"],"Los métodos se agrupan en marcos de referencia."],
+["met","Enseñanza SIN ERROR:","Objetivos alcanzables, pasos pequeños y refuerzo positivo continuo",["Secuencia amplia con una secuencia auxiliar","El alumno descubre la solución","Se ignora el resultado"],"Se pone mucha atención al resultado positivo."],
+["met","Enseñanza ENSAYO-ERROR:","Secuencia principal amplia con una auxiliar de pasos pequeños si no se supera",["Objetivos sin dificultad y refuerzo continuo","Solo instrucción directa","Mando directo absoluto"],"Importa más el proceso que el error; permite distintos ritmos."],
+["met","En el curso, ¿qué tipo de enseñanza (según carácter general) tiene más importancia al inicio?","La enseñanza sin error",["Ensayo-error","Descubrimiento guiado","Programa individual"],"Se usan las dos, pero al inicio pesa más la enseñanza sin error."],
+["met","Según el enfoque instruccional, ¿cuál usa fundamentalmente el curso?","Instrucción directa",["Búsqueda o descubrimiento","Enseñanza recíproca","Global pura"],"El técnico da información directa y debe ser un modelo a seguir."],
+["met","¿Cuándo se puede usar la enseñanza mediante búsqueda o descubrimiento?","Cuando la reproducción de modelos no funciona por problemas motores individuales",["Siempre en iniciación","Con niños de 7 años","Para enseñar el reglamento"],"Se relaciona con el ensayo-error: importa el proceso."],
+["met","Global con POLARIZACIÓN de la atención:","Tarea completa pero focalizando la atención en un aspecto",["Tarea completa sin indicaciones","Se descompone en partes","Se modifica la situación real"],"Ej.: golpe completo fijándose solo en la terminación."],
+["met","ANALÍTICO PROGRESIVO:","Se empieza por el elemento más importante y se añaden nuevos progresivamente",["Se empieza por la primera secuencia del golpe","Se empieza por la que el técnico elija","Tarea completa desde el principio"],"Es la estrategia principal del método del curso."],
+["met","ANALÍTICO SECUENCIAL:","Se empieza por la primera secuencia del golpe y se van uniendo las siguientes en orden",["Se empieza por lo más importante","Se practica todo a la vez","Se empieza por la secuencia que elija el técnico"],"Analítico puro = la secuencia que el técnico considere más adecuada."],
+["met","¿Hacia qué estrategia en la práctica se orienta el método del curso?","Analítica progresiva (también global con polarización y con modificación)",["Global pura","Analítica pura","Analítica secuencial"],"El golpe se descompone en progresiones."],
+["met","¿Cuál es la organización de clase MÁS efectiva según el manual?","Programa individual",["Mando directo","Asignación de tareas","Enseñanza recíproca"],"Se usa en clases particulares o programas de competición."],
+["met","¿Qué organizaciones usa fundamentalmente el curso Nivel I?","Mando directo y asignación de tareas",["Programa individual y recíproca","Solo enseñanza recíproca","Descubrimiento guiado"],"En ocasiones se incluyen las demás."],
+["met","Asignación de tareas:","El técnico propone ejercicios; ritmo y decisiones pasan a los alumnos (circuitos)",["El técnico decide todo y marca el ritmo","Un alumno corrige a otro","Clase particular"],"El técnico supervisa, corrige y anima."],
+["met","¿Cuándo es muy útil la ayuda individual?","Cuando el grupo de trabajo no es muy homogéneo",["Con grupos muy homogéneos","Solo en competición","Nunca en iniciación"],"Combina mando directo y asignación de tareas."],
+["met","Enseñanza recíproca:","Un alumno practica y otro corrige; luego cambian",["El técnico corrige a todos a la vez","Cada alumno hace un circuito","El alumno descubre solo"],"La evaluación pasa a los alumnos con supervisión del técnico."],
+["met","Mando directo: ¿cómo se organiza normalmente?","Filas y ruedas con control total del técnico",["Circuitos libres","Parejas que se corrigen","Partidos libres"],"El técnico decide, marca el ritmo y evalúa."],
+// ---------- MÉTODO FAP / CORRECCIÓN
+["fap","Características del método FAP:","Sin error, instrucción directa, analítico progresivo y mando directo",["Ensayo-error, descubrimiento, global y recíproca","Programa individual y global pura","Asignación de tareas y analítico puro"],"Truco: «SIAM» = Sin error, Instrucción directa, Analítico progresivo, Mando directo."],
+["fap","Fases del método de enseñanza (en orden):","Explicación → Demostración → Práctica → Corrección",["Demostración → Explicación → Práctica → Corrección","Práctica → Corrección → Explicación → Demostración","Explicación → Práctica → Demostración → Corrección"],"Truco: «El Día Perfecto Corrijo» (E-D-P-C)."],
+["fap","Una buena explicación debe…","Usar voz audible, mirar a todos, ir por pasos y evitar términos muy técnicos",["Ser larga y muy técnica","Hacerse durante la práctica","Hacerse mirando al alumno más avanzado"],"Asegurarse de que todos lo han comprendido."],
+["fap","¿Cuándo se hace la demostración?","Justo después de la explicación, sin errar y repitiéndola varias veces",["Antes de la explicación","Al final de la clase","Solo si el alumno la pide"],"Mientras demuestra, el técnico remarca los puntos importantes."],
+["fap","Al corregir, ¿qué observa el monitor PRIMERO?","El movimiento de la pala, empezando por el impacto",["La posición de los pies","La ropa del alumno","La empuñadura del compañero"],"Luego el movimiento completo de pala, el control de la pelota y el cuerpo."],
+["fap","Regla de oro de la corrección:","Corregir un solo error cada vez, siempre de forma positiva",["Corregir todos los errores juntos","Corregir parando siempre la clase","Corregir con explicaciones largas"],"Animar en todo momento y nunca descalificar."],
+["fap","Si el monitor duda de dónde está el error:","Mejor no decir nada hasta encontrarlo",["Corregir lo primero que vea","Pedir al alumno que lo adivine","Cambiar el ejercicio"],"Una corrección equivocada confunde al alumno."],
+["fap","¿Qué se corrige ANTES de lanzar la pelota?","La preparación del alumno",["La terminación","El impacto","El acompañamiento"],"Después de golpear: pies, avance, impacto y terminación."],
+["fap","¿Cuáles son las tres preguntas de la corrección?","Qué corregir, cómo corregir y cuándo corregir",["Quién, dónde y por qué","Cuánto, con qué y para qué","Antes, durante y después"],"Una cuarta clave: la comunicación alumno–técnico."],
+["fap","¿Cuál NO es una causa de error según el manual?","El color de la pala",["Déficit en la mecánica o comprensión del golpe","Falta de coordinación y ritmo","Errores previos por autoaprendizaje"],"Causas: mecánica/comprensión, habilidad física, coordinación y ritmo, autoaprendizaje."],
+["fap","Corrección típica en paredes: el alumno se pega a la pared. ¿Qué recurso se usa?","Poner conos a un metro de la pared",["Quitar la red","Usar pelotas de espuma","Cambiar de empuñadura"],"En dobles paredes, si se pega al rincón: conos para delimitar la zona."],
+["fap","Globo con cara de la pala recta y falta de altura. Corrección:","Golpear la bola por su parte inferior",["Golpear más fuerte","Cerrar la cara de la pala","Adelantar el impacto"],"La cara debe ir abierta."],
+["fap","¿Cómo se trata al alumno en la corrección?","Se enfoca el error en el golpe, no en la persona, siempre positivo",["Se le compara con otros","Se le imita para que se ría el grupo","Se le corrige solo al final del curso"],"El alumno debe sentir que el objetivo es común."],
+// ---------- ENTRENAMIENTO
+["ent","Diferencia entre planificar y programar:","Planificar es más amplio y general; programar detalla sesiones y ejercicios",["Son lo mismo","Programar es más amplio que planificar","Planificar es solo para competición"],"La programación se divide en periodos: anual, trimestral, mensual y sesiones diarias."],
+["ent","¿Qué niveles se tratan en el curso de Entrenador Nivel I?","Iniciación 1 e Iniciación 2",["Medio y perfeccionamiento","Solo iniciación 1","Todos los niveles"],"Medio y perfeccionamiento → Nivel II."],
+["ent","¿Cuál de estos objetivos es de INICIACIÓN 2?","Dobles paredes, voleas altas y bajas, golpes de malla y giros",["La bandeja","El remate por tres","El bote pronto"],"Bandeja, bote pronto y remate por 3 son de nivel medio."],
+["ent","¿Cuál es objetivo de INICIACIÓN 1?","Golpes básicos, subida a red, globo y nociones de reglamento",["Contrapared","Efecto cortado","Giros en doble pared"],"También principios tácticos generales y juego de defensa y ataque."],
+["ent","¿En qué nivel se aprende la bandeja?","Nivel medio",["Iniciación 1","Iniciación 2","Perfeccionamiento"],"Junto con contrapared, bote pronto, passing y efectos."],
+["ent","El sistema de entrenamiento más habitual en las escuelas de pádel es…","El carro de pelotas",["Peloteo entre alumnos","Partidos libres","Peloteo con el técnico"],"Muy importante en pretemporada; objetivo muy específico (técnica de un golpe)."],
+["ent","Orden de los sistemas de entrenamiento (de menor a mayor dificultad):","Carro → Peloteo con técnico → Entre alumnos con ayuda → Entre alumnos",["Peloteo con técnico → Carro → Entre alumnos","Entre alumnos → Carro → Peloteo","Carro → Entre alumnos → Peloteo con técnico"],"Truco: «Carro, Técnico, Ayuda, Solos»."],
+["ent","El peloteo con el técnico es más indicado para…","Trabajar progresiones tácticas (dirección, profundidad, ritmo)",["Aprender la empuñadura","Trabajar la condición física","Partidos de competición"],"En iniciación 1 requiere un mínimo de control."],
+["ent","Peloteo entre alumnos CON ayuda del técnico: ¿a partir de cuándo?","Desde iniciación 2 y a partir de mitad del año deportivo",["Desde el primer día","Solo en perfeccionamiento","Solo en pretemporada"],"Requiere control y dirección de la pelota."],
+["ent","Peloteo entre alumnos (sin ayuda): ¿cuándo se usa por regla general?","A partir del nivel medio, en periodos de precompetición",["En la primera clase de iniciación","Solo con niños","Nunca"],"En iniciación como complemento con baja carga técnica/táctica."],
+["ent","Lanzamiento en iniciación 1: ¿cómo empieza el monitor?","En el campo del alumno lanzando con la mano",["Desde el fondo con remate","Con efecto liftado","Desde la red con volea"],"Después lanza con la pala desde su campo, cerca de la red."],
+["ent","Lanzamiento con pala en iniciación 1:","Continental, trayectoria ligeramente hacia arriba, plana y sin efecto",["Con efecto cortado y potente","Globo alto","Con empuñadura este de revés"],"De lado al carro; primero recto al alumno y luego cruzado."],
+["ent","El entrenamiento táctico, comparado con el técnico…","Tiene componentes más teóricos que requieren aprender conceptos",["Es solo práctico","No necesita objetivos","Se hace solo en competición"],"El técnico es fundamentalmente práctico una vez comprendida la mecánica."],
+// ---------- EJERCICIOS
+["eje","Orden de los modelos de ejercicios:","A técnico simple → B táctico simple → C técnico combinado → D táctico combinado",["A táctico simple → B técnico simple → C táctico combinado → D técnico combinado","A técnico combinado → B táctico combinado → C simple → D global","A técnico simple → B técnico combinado → C táctico simple → D táctico combinado"],"Truco: impar = técnico (A, C); par = táctico (B, D). Simple primero, combinado después."],
+["eje","Modelo A de ejercicios:","Ejercicios técnicos simples (progresiones)",["Ejercicios tácticos simples","Técnicos combinados","Tácticos combinados"],"Mando e instrucción directa, ensayo sin error, análisis progresivo."],
+["eje","Modelo C:","Técnicos combinados: varios golpes seguidos, con carro de pelotas",["Un solo golpe con aplicación táctica","Situación real con peloteo","Progresiones de un golpe"],"Requiere superar las progresiones de al menos dos golpes."],
+["eje","Modelo D:","Tácticos combinados: situación más real, con peloteo",["Progresiones técnicas","Un golpe aislado","Juegos populares"],"Los más avanzados: jugadas de menor a mayor dificultad."],
+["eje","Modelo B:","Tácticos simples: un solo golpe con una aplicación táctica, situación cerrada",["Varios golpes combinados","Progresiones técnicas","Juego libre"],"Se trabaja con peloteos, primero con el técnico."],
+["eje","Número de progresiones en INICIACIÓN 1:","Niños 3 progresiones, adultos 2",["Niños 2, adultos 3","Todos 3","Todos 2"],"Excepto servicio y resto, que tienen su propia dinámica."],
+["eje","¿Hasta qué edad aprox. se considera niño/a para la enseñanza técnica?","Hasta los 11-12 años",["Hasta los 8 años","Hasta los 16 años","Hasta los 14 años"],"Por eso las progresiones distinguen niños y adultos."],
+["eje","Progresiones en INICIACIÓN 2:","Tres progresiones, iguales para niños y adultos (malla y variantes de volea: dos)",["Niños 3 y adultos 2","Cinco progresiones","Una progresión"],"Un niño de iniciación 2 tiene el mismo nivel que un adulto de ese nivel."],
+["eje","1ª progresión de derecha con niños: ¿objetivo?","Aprender avance, impacto y terminación (el «swing»)",["Aprender la posición de espera","Aprender el juego de pies","Jugar un partido"],"Alumno de lado, 1 m por delante de la línea de saque; monitor lanza con la mano en el mismo campo."],
+["eje","La última progresión (3ª niños / 2ª adultos) de los golpes de fondo añade…","La posición de espera y la preparación, uniendo el golpe global",["Solo el impacto","El efecto cortado","El remate"],"Se parte de frente a la red."],
+["eje","Volea de derecha, 1ª progresión niños: ¿dónde se coloca el alumno?","De lado, a un metro de la red",["En la línea de fondo","A dos metros de la red de frente","En la línea de saque"],"Objetivo: avance, impacto y terminación sin juego de pies."],
+["eje","Ejercicio complementario de «sombras»:","Hacer el gesto sin pelota para interiorizar el movimiento",["Jugar a la sombra en verano","Seguir al compañero","Golpear sin red"],"Útil en primeras progresiones, pero no recomendable sobre todo en adultos."],
+["eje","Tipos de ejercicios complementarios:","Técnicos, tácticos y físico-psicomotrices",["Solo técnicos","Populares y específicos","Simples y combinados"],"Ayudan al ejercicio específico y son de menor dificultad."],
+["eje","¿Para quién están indicados sobre todo los ejercicios psicomotrices?","Alumnos de corta edad",["Adultos de iniciación","Jugadores profesionales","Solo monitores"],"Coordinación, lateralidad, cambios de dirección, manipulaciones óculo-manuales."],
+["eje","Ejercicios complementarios tácticos: ¿con qué sistema?","Peloteo entre alumnos con supervisión del monitor",["Carro de pelotas","Clase particular","Sin supervisión"],"Deben ser de menor dificultad que el específico."],
+// ---------- JUEGOS Y SESIÓN
+["ses","¿Cuánto dura una sesión de iniciación?","60 minutos",["45 minutos","90 minutos","30 minutos"],"Calentamiento 8-10' + Técnica ≥20' + Táctica 20' + Final ~10'."],
+["ses","Duración del calentamiento:","Entre 8 y 10 minutos como máximo",["20 minutos","2 minutos","15-20 minutos"],"Crea hábito desde pequeños, aunque en niños la lesión es poco probable."],
+["ses","La parte principal TÉCNICA dura…","No menos de 20 minutos",["10 minutos","5 minutos","40 minutos exactos"],"Normalmente con el sistema de carros."],
+["ses","Si en iniciación 1 los alumnos aún no controlan la pelota:","No hay parte táctica: se trabajan dos golpes técnicos, 20 min cada uno",["Se juega un partido","Se alarga el calentamiento","Se cancela la sesión"],"La parte táctica requiere haber completado alguna progresión."],
+["ses","¿Qué se hace en la parte final de la sesión?","Juegos divertidos relacionados con el trabajo principal (~10 min)",["Estiramientos de 20 min","Teoría","Progresiones nuevas"],"Momento ideal para consejos tácticos y charlar con los alumnos."],
+["ses","Fases del juego (en orden):","Preparación → Presentación → Ejecución → Calificación",["Presentación → Preparación → Calificación → Ejecución","Ejecución → Preparación → Presentación → Calificación","Explicación → Demostración → Práctica → Corrección"],"Truco: «Primero Preparo, Presento, Ejecuto y Califico» (las 2 P + E + C)."],
+["ses","Tipos de juegos según su objetivo:","Sensorial, motor y asociativo",["Técnico, táctico y físico","Popular, específico y libre","Simple y combinado"],"Asociativo = confraternización y trabajo en equipo."],
+["ses","Formas de calificar un juego:","Por puntos, por eliminación y por premios",["Por tiempo y por edad","Solo por puntos","Por sorteo"],"El monitor debe ser rápido, claro e imparcial."],
+["ses","¿Cuándo se usa principalmente el juego en clase con niños?","Al final de la clase como vuelta a la calma",["Solo al principio","Nunca","En la parte técnica"],"También al inicio (calentamiento dinámico) o en medio sin restar importancia."],
+["ses","Aspectos a destacar al elaborar ejercicios:","Organización, dinámica, seguridad y diversión",["Fuerza, velocidad y potencia","Explicación y demostración","Planificar y programar"],"Truco: «ODSD» — Orden, Dinamismo, Seguridad, Diversión."],
+["ses","Tipos de organización de ejercicios:","Ruedas, circuitos, estaciones, tareas individuales y filas rápidas",["Carros, peloteos y partidos","Global y analítica","Mando y recíproca"],"Objetivo de seguridad: evitar golpes de pala, impactos, caídas y choques."],
+["ses","Juego «Rueda de vidas»:","Rueda de golpeo con el técnico; cada error resta una vida",["Juego de persecución sin pala","Juego de agruparse por números","Lanzar pelotas al otro campo"],"Al final de clase o como calentamiento sin puntuación."],
+["ses","Juego «Rey de pista»:","Un rey y aspirantes que deben ganarle puntos para reinar",["Llegar a 21 puntos","Perder vidas","Esquivar pelotas"],"Mínimo tres alumnos; desarrolla combinaciones de golpes."],
+["ses","«El Cazabolas»:","Hay una pelota menos que jugadores; quien se queda sin pelota queda eliminado",["Se lanzan pelotas a los alumnos para eliminarlos","Relevos contra la pared","Pilla pilla por parejas"],"Trabaja coordinación, velocidad, agilidad y percepción visual."],
+["ses","«Matapollos»:","El monitor lanza pelotas a los alumnos en un recuadro; si te toca, eliminado",["Hay una pelota menos que jugadores","Se juega a caballito","Se juega a 21 puntos"],"Coordinación, equilibrio y percepción espacial."],
+["ses","Las manipulaciones de pala y pelota se usan sobre todo en…","Iniciación 1 y con niños, para afianzar empuñadura y coordinación",["Perfeccionamiento","Competición","Solo con adultos"],"Botar arriba/abajo, con el canto, alternar caras, llevarla sobre la pala…"]
+];
+const CARDS = RAW.map((r,i)=>({id:"c"+i,t:r[0],q:r[1],a:r[2],d:r[3],e:r[4]}));
+
+// Verdadero / Falso
+const TFR = [
+["emp","La empuñadura continental es la recomendada para la mayoría de golpes.",1,"Sí: permite todo tipo de golpes."],
+["emp","Las empuñaduras del pádel son iguales que las del tenis actual.",0,"Se parecen a las del tenis de los años 70."],
+["emp","Con niños con poca fuerza en la muñeca se recomienda empezar con continental.",0,"Mejor este de derecha, revés a dos manos o este de revés."],
+["emp","La economía es uno de los tres componentes generales de la técnica.",1,"Fluidez, economía y eficacia."],
+["fas","El servicio y el remate siguen exactamente las mismas fases que los demás golpes.",0,"Son la excepción."],
+["fas","En la volea se impacta a la altura del pecho.",1,"Fondo = cintura; volea = pecho."],
+["fas","En el remate, el primer paso de la preparación es adelantar el pie.",0,"Se atrasa (igual que en rebotes de fondo y dobles)."],
+["fas","El split step consiste en parar de frente cuando el rival golpea al subir a la red.",1,"Correcto."],
+["fas","La terminación del globo es corta.",0,"Es larga, acaba por encima de la cabeza."],
+["fas","Impactar con la cara ligeramente abierta da más control y precisión.",1,"Correcto."],
+["reb","El doble rebote lateral-fondo es «el que cierra».",0,"Lateral-fondo = abre. Fondo-lateral = cierra."],
+["reb","El efecto cortado hace que la pelota gire hacia atrás y se deslice al botar.",1,"Correcto."],
+["reb","El rebote en la malla es muy predecible.",0,"Es impredecible."],
+["reb","En el rebote de fondo hay que colocarse detrás de la pelota.",1,"Para impactar delante del cuerpo."],
+["reb","El liftado hace que la pelota caiga más rápido.",1,"Rotación hacia delante."],
+["gol","El resto busca ganar el punto directamente.",0,"Busca no fallar y no dejar un golpe fácil."],
+["gol","El globo ideal busca altura media y dirección cruzada.",1,"Correcto."],
+["gol","El remate debe retrasarse hasta nivel medio por ser difícil.",0,"No debe retardarse su aprendizaje."],
+["gol","La volea alta es un golpe defensivo-constructivo.",1,"Para no perder la red."],
+["gol","El servicio es el único golpe en el que el jugador se lanza la pelota.",1,"Correcto."],
+["tac","La táctica es la parte práctica de la estrategia.",1,"Correcto."],
+["tac","La primera aplicación táctica que se trabaja es la potencia.",0,"Es el control; la potencia es la última."],
+["tac","La dirección paralela tiene la red más baja.",0,"La red está más alta en paralelo; más baja en cruzado."],
+["tac","La percepción y análisis es la primera fase de la acción táctica.",1,"Luego decisión y solución motriz."],
+["tac","Profundidad y velocidad son lo mismo.",0,"No hay que confundirlas."],
+["tac","La «chiquita» es una bola a los pies de los rivales en la red.",1,"Correcto."],
+["pri","Vale lo mismo un punto espectacular que un error no forzado del rival.",1,"Por eso es mejor no arriesgar de más."],
+["pri","La zona constructiva es la más segura para buscar golpes ganadores.",0,"Es peligrosa; se juega con control."],
+["pri","Con viento a favor, los globos se tiran con más fuerza.",0,"Con viento a favor, más suaves; en contra, más fuerza."],
+["pri","La pista de cristal siempre tiene 3 metros, por eso se puede rematar por tres.",1,"Correcto."],
+["pri","En la teoría de la cuerda los jugadores mantienen siempre la misma distancia.",1,"Se mueven juntos."],
+["pri","Las pistas deben orientarse con su eje longitudinal Este-Oeste.",0,"Norte-Sur (N-NE a N-NO)."],
+["pri","Con humedad, en pista de cristal conviene jugar más con efecto.",0,"Más plano y lo menos posible de pared."],
+["par","A los 7-8 años se busca jugar con velocidad y potencia.",0,"A los 7-8: seguro, defensivo y en pareja."],
+["par","Si fallan la táctica principal y las secundarias, se recurre a una medida arriesgada.",1,"Cambio radical."],
+["par","«No protestar en voz alta» es un ejemplo de objetivo psicológico.",1,"Correcto."],
+["met","La organización más efectiva es el programa individual.",1,"Clases particulares o competición."],
+["met","El curso usa fundamentalmente la enseñanza por descubrimiento.",0,"Usa la instrucción directa."],
+["met","En la enseñanza recíproca un alumno practica y otro corrige.",1,"Luego cambian."],
+["met","El analítico secuencial empieza por el elemento más importante.",0,"Ese es el progresivo; el secuencial empieza por la primera secuencia."],
+["fap","En la corrección se deben corregir varios errores a la vez para ahorrar tiempo.",0,"Uno cada vez."],
+["fap","La demostración se hace antes de la explicación.",0,"Explicación → Demostración."],
+["fap","Si el monitor duda de dónde está el error, es mejor no decir nada aún.",1,"Correcto."],
+["fap","Al corregir, lo primero que se observa es el impacto / movimiento de la pala.",1,"Correcto."],
+["ent","La bandeja es un objetivo de iniciación 2.",0,"Es de nivel medio."],
+["ent","El carro de pelotas es el sistema más habitual en escuelas.",1,"Sobre todo en iniciación."],
+["ent","Programar es un concepto más amplio que planificar.",0,"Al revés: planificar es más amplio."],
+["ent","En iniciación 1 el monitor empieza lanzando con la mano en el campo del alumno.",1,"Correcto."],
+["eje","El modelo C corresponde a ejercicios técnicos combinados.",1,"A técnico simple, B táctico simple, C técnico combinado, D táctico combinado."],
+["eje","En iniciación 1 los adultos hacen 3 progresiones y los niños 2.",0,"Al revés: niños 3, adultos 2."],
+["eje","Las sombras son especialmente recomendables en adultos.",0,"No son recomendables sobre todo en adultos."],
+["ses","La sesión de iniciación dura 60 minutos.",1,"Correcto."],
+["ses","El calentamiento debe durar unos 20 minutos.",0,"8-10 minutos como máximo."],
+["ses","Los tipos de juego son sensorial, motor y asociativo.",1,"Correcto."],
+["ses","La calificación es la primera fase del juego.",0,"Es la última: Preparación, Presentación, Ejecución, Calificación."]
+];
+const TFS = TFR.map((r,i)=>({id:"t"+i,t:r[0],s:r[1],v:!!r[2],e:r[3]}));
+
+// Secuencias para ordenar
+const SEQS = [
+ {t:"fas",n:"Fases de golpeo",it:["Posición de espera","Preparación del golpe","Avance","Impacto","Terminación"]},
+ {t:"emp",n:"Componentes de la técnica (como en el manual)",it:["Fluidez o naturalidad","Economía o eficiencia","Eficacia"]},
+ {t:"tac",n:"Aplicaciones tácticas (fácil → difícil)",it:["Control","Dirección","Profundidad","Altura","Velocidad","Potencia"]},
+ {t:"tac",n:"Fases de la acción táctica",it:["Percepción y análisis","Toma de decisión","Solución motriz"]},
+ {t:"tac",n:"Estrategia → … (ejemplo del manual)",it:["Estrategia: jugar defensivamente","Táctica: sistemas defensivos","Técnica: golpes de globo"]},
+ {t:"fap",n:"Fases del método de enseñanza",it:["Explicación","Demostración","Práctica","Corrección"]},
+ {t:"ent",n:"Sistemas de entrenamiento (fácil → difícil)",it:["Carro de pelotas","Peloteo con el técnico","Peloteo entre alumnos con ayuda","Peloteo entre alumnos"]},
+ {t:"eje",n:"Modelos de ejercicios",it:["A · Técnico simple","B · Táctico simple","C · Técnico combinado","D · Táctico combinado"]},
+ {t:"ses",n:"Partes de la sesión",it:["Calentamiento (8-10')","Parte principal técnica (≥20')","Parte principal táctica (20')","Parte final: juegos (~10')"]},
+ {t:"ses",n:"Fases del juego",it:["Preparación","Presentación","Ejecución","Calificación"]},
+ {t:"par",n:"Progresión táctica por edades",it:["7-8: seguro y en pareja","9-10: dirección y profundidad","11-12: velocidad y decisiones","13-14: variar y efectos","15-18: patrón y competición"]},
+ {t:"pri",n:"Zonas tácticas (fondo → red)",it:["Zona defensiva","Zona constructiva","Zona de ataque"]},
+ {t:"ent",n:"Niveles de juego",it:["Iniciación 1","Iniciación 2","Medio","Perfeccionamiento"]},
+ {t:"ent",n:"Periodos de programación (largo → corto)",it:["Anual","Trimestral","Mensual","Sesión diaria"]},
+ {t:"fas",n:"Remate: fases (manual)",it:["Posición de espera","Preparación","Ajuste de pies y bucle","Avance","Impacto","Terminación"]}
+];
+
+// Parejas término ↔ definición
+const PAIRS = [
+ ["emp","Continental","Zonas 1-2, pulgar arriba zona 4"],["emp","Este de derecha","Zona 2, pulgar zona 4"],["emp","Este de revés","Zona 1, pulgar zona 3"],
+ ["reb","Cortado","Rotación hacia atrás"],["reb","Liftado","Rotación hacia delante"],["reb","Lateral-fondo","Doble rebote que abre"],["reb","Fondo-lateral","Doble rebote que cierra"],
+ ["tac","Paralelo","Menos metros, red más alta"],["tac","Cruzado","Más distancia, red más baja"],["tac","Al medio","Genera confusión entre rivales"],["tac","Chiquita","Bola a los pies del que está en red"],
+ ["pri","ENF","Error no forzado"],["pri","Teoría de la cuerda","Moverse juntos a igual distancia"],["pri","Zona constructiva","Entre línea de saque y red"],["pri","Golpe defensivo","Globo"],["pri","Golpe de construcción","Voleas y bandejas"],["pri","Golpe ganador","Remate"],
+ ["met","Mando directo","Técnico decide y marca el ritmo"],["met","Asignación de tareas","Circuitos con estaciones"],["met","Enseñanza recíproca","Un alumno practica, otro corrige"],["met","Programa individual","Organización más efectiva"],["met","Analítico progresivo","Lo más importante primero"],["met","Global con polarización","Todo el golpe, atención en un aspecto"],["met","Sin error","Refuerzo positivo continuo"],
+ ["eje","Modelo A","Técnico simple"],["eje","Modelo B","Táctico simple"],["eje","Modelo C","Técnico combinado"],["eje","Modelo D","Táctico combinado"],["eje","Sombras","Gesto sin pelota"],
+ ["ses","Calentamiento","8-10 minutos"],["ses","Cazabolas","Una pelota menos que jugadores"],["ses","Rey de pista","Aspirantes contra el rey"],["ses","Juego asociativo","Trabajo en equipo"],
+ ["fas","3 en 1","Codo a la altura del hombro (remate)"],["fas","Split step","Parar de frente al golpe rival"],["fas","Impacto volea","Altura del pecho"],["fas","Impacto fondo","Altura de la cintura"],
+ ["ent","Carro de pelotas","Sistema más habitual"],["ent","Bandeja","Nivel medio"],["ent","Planificar","Más amplio que programar"]
+];
+
+// Trucos de memoria
+const MNEMO = [
+ ["emp","<b>FEE</b> — los 3 componentes de la técnica: <b>F</b>luidez, <b>E</b>conomía, <b>E</b>ficacia."],
+ ["emp","Zonas del mango: <b>Continental «1-2 / 4»</b> · <b>Este derecha «2 / 4»</b> · <b>Este revés «1 / 3»</b> (mano / pulgar)."],
+ ["fas","<b>E-P-A-I-T</b>: «<b>E</b>n <b>P</b>ádel <b>A</b>taco, <b>I</b>mpacto y <b>T</b>ermino» → Espera, Preparación, Avance, Impacto, Terminación."],
+ ["fas","Alturas de impacto: <b>Fondo = cintura</b>, <b>Volea = pecho</b>, <b>Remate = brazo totalmente extendido</b>."],
+ ["fas","Primer paso: <b>ADELANTO</b> en fondo sin rebote, voleas y restos · <b>ATRASO</b> en remate, rebote de fondo y doble rebote · <b>ROTO</b> en rebote lateral."],
+ ["reb","<b>Lateral-fondo ABRE</b> (te alejas del lateral, la bola va al centro). <b>Fondo-lateral CIERRA</b> (te acercas al lateral)."],
+ ["reb","<b>Cortado = Cae y se arrastra</b> (rotación atrás). <b>Liftado = Lanza hacia arriba</b> (rotación delante, bota alto)."],
+ ["tac","<b>C-D-P-A-V-P</b>: «<b>C</b>ada <b>D</b>ía <b>P</b>ractico <b>A</b>lgo: <b>V</b>elocidad y <b>P</b>otencia» → Control, Dirección, Profundidad, Altura, Velocidad, Potencia."],
+ ["tac","Acción táctica <b>PDS</b>: <b>P</b>ercibo → <b>D</b>ecido → <b>S</b>oluciono (motriz). Feedback cierra el ciclo."],
+ ["tac","<b>Paralelo = Peligro</b> (red alta, pocos metros, sorpresa). <b>Cruzado = Calma</b> (red baja, más distancia). <b>Medio = Mareo</b> (confusión)."],
+ ["pri","Zonas: <b>DCA</b> — <b>D</b>efiendo (fondo) → <b>C</b>onstruyo (media pista) → <b>A</b>taco (red + 2-3 m)."],
+ ["pri","Golpes tácticos: <b>Globo defiende · Volea/Bandeja construye · Remate gana</b>."],
+ ["pri","Viento: <b>EN CONTRA = MÁS fuerza</b>; <b>A FAVOR = MÁS suave</b>. Sol de cara → deja botar y juega de pared."],
+ ["par","Edades: <b>7-8 Seguro · 9-10 Dirección · 11-12 Velocidad · 13-14 Variar · 15-18 Competir</b> → «<b>S</b>iempre <b>D</b>a <b>V</b>alor <b>V</b>encer <b>C</b>ompitiendo»."],
+ ["par","Partido: Funciona → no tocar · Se iguala → más concentración · Pierdo claro → secundarias · Nada funciona → medida arriesgada."],
+ ["met","Organización: <b>Mando directo · Asignación de tareas · Ayuda individual · Recíproca · Programa individual (la más efectiva)</b>."],
+ ["met","Analítico: <b>Progresivo = lo más importante primero</b> · <b>Secuencial = en orden</b> · <b>Puro = lo que elija el técnico</b>."],
+ ["fap","Método FAP <b>SIAM</b>: <b>S</b>in error · <b>I</b>nstrucción directa · <b>A</b>nalítico progresivo · <b>M</b>ando directo."],
+ ["fap","Fases <b>EDPC</b>: «<b>E</b>l <b>D</b>ía <b>P</b>erfecto <b>C</b>orrijo» → Explicación, Demostración, Práctica, Corrección."],
+ ["fap","Corrección: <b>QUÉ → CÓMO → CUÁNDO</b>. Un error cada vez, en positivo. Si dudas, calla hasta encontrarlo."],
+ ["ent","Sistemas: «<b>Carro, Técnico, Ayuda, Solos</b>» (de más fácil a más difícil)."],
+ ["ent","Nivel I = <b>Iniciación 1 y 2</b>. Nivel II = <b>Medio y Perfeccionamiento</b>. Bandeja, bote pronto, remate por 3 → <b>Medio</b>."],
+ ["eje","Modelos: letras <b>impares A·C = Técnico</b>, <b>pares B·D = Táctico</b>. Primero simple (A,B), luego combinado (C,D)."],
+ ["eje","Progresiones Iniciación 1: <b>Niños 3, Adultos 2</b>. Iniciación 2: <b>3 para todos</b> (malla y variantes de volea: 2)."],
+ ["ses","Sesión 60': <b>10 + 20 + 20 + 10</b> → Calentamiento, Técnica, Táctica, Juegos."],
+ ["ses","Juego: <b>Preparo, Presento, Ejecuto, Califico</b>. Tipos: <b>Sensorial, Motor, Asociativo</b> («SMA»)."],
+ ["ses","Elaborar ejercicios: <b>ODSD</b> → Organización, Dinámica, Seguridad, Diversión."]
+];
+
+/* ====================== ESTADO ====================== */
+const KEY="padelquest_v1";
+const DAY=864e5, MIN=6e4;
+const INTERVALS=[1*MIN,10*MIN,1*DAY,3*DAY,7*DAY,16*DAY,35*DAY];
+const LEVELS=["Recogepelotas","Alumno Iniciación 1","Alumno Iniciación 2","Monitor en prácticas","Monitor","Entrenador Nivel I","Entrenador Nivel II","Leyenda del Pádel"];
+let S;
+function fresh(){return {xp:0,cards:{},tstat:{},daily:{d:"",xp:0},streak:{last:"",n:0},best:{tf:0,match:0,combo:0},wins:0,answered:0,badges:[],goal:60,filter:"all"}}
+function load(){try{S=JSON.parse(localStorage.getItem(KEY))||fresh()}catch(e){S=fresh()} S=Object.assign(fresh(),S)}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+const today=()=>new Date().toISOString().slice(0,10);
+function cs(id){return S.cards[id]||(S.cards[id]={b:0,due:0,ok:0,ko:0,seen:0})}
+function ts(t){return S.tstat[t]||(S.tstat[t]={ok:0,ko:0})}
+
+function touchDay(){
+  const d=today();
+  if(S.daily.d!==d){S.daily={d,xp:0}}
+  if(S.streak.last!==d){
+    const y=new Date(Date.now()-DAY).toISOString().slice(0,10);
+    S.streak.n = S.streak.last===y ? S.streak.n+1 : 1;
+    S.streak.last=d;
+  }
+}
+function addXP(n){touchDay();S.xp=Math.max(0,S.xp+n);S.daily.xp=Math.max(0,S.daily.xp+n);save()}
+function levelOf(xp){let l=Math.floor(Math.sqrt(xp/60));l=Math.min(l,LEVELS.length-1);const cur=60*l*l,nxt=60*(l+1)*(l+1);return{l,name:LEVELS[l],p:l>=LEVELS.length-1?1:(xp-cur)/(nxt-cur),need:nxt-xp}}
+
+// registrar resultado de una tarjeta MCQ / SRS
+function record(t,ok,cardId,grade){
+  const st=ts(t); ok?st.ok++:st.ko++; S.answered++;
+  if(cardId){
+    const c=cs(cardId); c.seen++; ok?c.ok++:c.ko++;
+    if(grade===undefined) grade= ok?2:0;
+    if(grade===0) c.b=0;
+    else if(grade===1) c.b=Math.max(1,c.b);
+    else if(grade===2) c.b=Math.min(6,c.b+1);
+    else c.b=Math.min(6,c.b+2);
+    c.due=Date.now()+INTERVALS[c.b];
+  }
+  checkBadges(); save();
+}
+function mastery(t){
+  const list=CARDS.filter(c=>c.t===t); if(!list.length) return 0;
+  let m=0; list.forEach(c=>{const s=S.cards[c.id]; if(s) m+=Math.min(s.b,5)/5});
+  return Math.round(100*m/list.length);
+}
+function acc(t){const s=S.tstat[t]; if(!s||s.ok+s.ko===0) return null; return Math.round(100*s.ok/(s.ok+s.ko))}
+function overall(){return Math.round(TOPICS.reduce((a,t)=>a+mastery(t.id),0)/TOPICS.length)}
+function dueCount(){const now=Date.now();return CARDS.filter(c=>S.cards[c.id]&&S.cards[c.id].due<=now&&inFilter(c.t)).length}
+function newCount(){return CARDS.filter(c=>!S.cards[c.id]&&inFilter(c.t)).length}
+function inFilter(t){const f=S.filter; if(f==="all")return true; if(f==="a2")return TN[t].a===2; if(f==="a3")return TN[t].a===3; if(f==="weak")return weakTopics().includes(t); return f===t}
+function weakTopics(){
+  return TOPICS.map(t=>({t:t.id,s:mastery(t.id)*.6+((acc(t.id)??50))*.4})).sort((a,b)=>a.s-b.s).slice(0,3).map(x=>x.t);
+}
+// prioridad inteligente: vencidas > débiles > nuevas > resto
+function pickCards(n){
+  const now=Date.now();
+  const pool=CARDS.filter(c=>inFilter(c.t));
+  const scored=pool.map(c=>{
+    const s=S.cards[c.id]; let p;
+    if(!s) p=50+Math.random()*20;
+    else if(s.due<=now) p=100-s.b*8+(s.ko-s.ok)*3+Math.random()*10;
+    else p=20-s.b*3+Math.random()*15;
+    const a=acc(c.t); if(a!==null) p+= (100-a)/5;
+    return {c,p};
+  }).sort((a,b)=>b.p-a.p);
+  // intercalado: evitar 2 seguidas del mismo tema
+  const top=scored.slice(0,Math.min(pool.length,n*3)).map(x=>x.c);
+  const out=[]; let last=null;
+  while(out.length<n&&top.length){
+    let i=top.findIndex(c=>c.t!==last); if(i<0)i=0;
+    out.push(top[i]); last=top[i].t; top.splice(i,1);
+  }
+  return out;
+}
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+
+/* ====================== LOGROS ====================== */
+const BADGES=[
+ ["first","🎾","Primer punto","Responde tu primera pregunta",()=>S.answered>=1],
+ ["a50","🔥","Calentando","50 respuestas",()=>S.answered>=50],
+ ["a250","💪","Pretemporada","250 respuestas",()=>S.answered>=250],
+ ["a700","🏋️","Máquina de entrenar","700 respuestas",()=>S.answered>=700],
+ ["combo8","⚡","Racha de 8","8 aciertos seguidos en Rally",()=>S.best.combo>=8],
+ ["combo15","🌪️","Imparable","15 aciertos seguidos",()=>S.best.combo>=15],
+ ["win1","🏆","Primer partido","Gana un partido al Rival",()=>S.wins>=1],
+ ["win5","👑","Rey de pista","Gana 5 partidos",()=>S.wins>=5],
+ ["tf15","⏱️","Reflejos","15+ en Verdadero/Falso",()=>S.best.tf>=15],
+ ["streak3","📅","Constancia","3 días seguidos",()=>S.streak.n>=3],
+ ["streak7","🗓️","Hábito de campeón","7 días seguidos",()=>S.streak.n>=7],
+ ["topic80","🎯","Especialista","Un tema al 80% de dominio",()=>TOPICS.some(t=>mastery(t.id)>=80)],
+ ["a2","📘","Área 2 dominada","Todos los temas del Área 2 ≥ 70%",()=>TOPICS.filter(t=>t.a===2).every(t=>mastery(t.id)>=70)],
+ ["a3","📗","Área 3 dominada","Todos los temas del Área 3 ≥ 70%",()=>TOPICS.filter(t=>t.a===3).every(t=>mastery(t.id)>=70)],
+ ["all","🥇","Entrenador Nivel I","Dominio global ≥ 85%",()=>overall()>=85]
+];
+function checkBadges(){
+  BADGES.forEach(b=>{ if(!S.badges.includes(b[0]) && b[4]()){ S.badges.push(b[0]); toast(b[1]+" ¡Logro: "+b[2]+"!"); } });
+}
+let tt; function toast(m){const e=document.getElementById("toast");e.textContent=m;e.classList.add("on");clearTimeout(tt);tt=setTimeout(()=>e.classList.remove("on"),2200)}
+
+/* ====================== UI BASE ====================== */
+const $app=document.getElementById("app");
+const h=s=>s;
+function esc(s){return String(s).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]))}
+let timerId=null; function clearT(){if(timerId){clearInterval(timerId);timerId=null}}
+function go(view){clearT(); const want=view==="home"?"":view; if(location.hash.slice(1)!==want){location.hash=want}else{render(view)} window.scrollTo(0,0)}
+window.addEventListener("hashchange",()=>{clearT();render(location.hash.slice(1)||"home")});
+function backBtn(){return `<button class="back" onclick="go('home')">← Volver</button>`}
+function colorFor(p){return p>=75?"var(--ok)":p>=45?"var(--warn)":"var(--ko)"}
+
+function ring(p){const r=26,c=2*Math.PI*r;return `<svg class="ring" viewBox="0 0 64 64"><circle cx="32" cy="32" r="${r}" stroke="#ffffff22" stroke-width="7" fill="none"/><circle cx="32" cy="32" r="${r}" stroke="var(--ball)" stroke-width="7" fill="none" stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${c*(1-Math.min(1,p))}" transform="rotate(-90 32 32)"/><text x="32" y="37" text-anchor="middle" fill="#fff" font-size="14" font-weight="800">${Math.round(Math.min(1,p)*100)}%</text></svg>`}
+
+function filterChips(){
+  const opts=[["all","Todo"],["a2","Área 2"],["a3","Área 3"],["weak","🎯 Puntos débiles"]];
+  return `<div class="chips">${opts.map(o=>`<button class="chip ${S.filter===o[0]?"on":""}" onclick="setF('${o[0]}')">${o[1]}</button>`).join("")}
+  <select class="chip" onchange="setF(this.value)" style="appearance:none">
+    <option value="">Tema…</option>${TOPICS.map(t=>`<option value="${t.id}" ${S.filter===t.id?"selected":""}>${t.ic} ${t.n}</option>`).join("")}
+  </select></div>`;
+}
+function setF(f){if(!f)return;S.filter=f;save();render(location.hash.slice(1)||"home")}
+
+/* ====================== HOME ====================== */
+function home(){
+  touchDay(); save();
+  const L=levelOf(S.xp), due=dueCount(), nw=newCount();
+  const wk=weakTopics();
+  const anyData=S.answered>0;
+  return `
+  <div class="top"><div class="ballic"></div><div><h1>PÁDEL QUEST</h1><small>Entrenador Nivel I · Áreas 2 y 3</small></div><div class="spacer"></div><span class="pill">🔥 ${S.streak.n}</span></div>
+  <div class="card hero">
+    <div class="lvl"><div><small class="mut" style="color:#cfe0ff">Nivel ${L.l+1}</small><div class="name disp">${L.name}</div></div>
+    <div style="text-align:right"><b class="disp" style="font-size:22px">${S.xp}</b> <small>XP</small></div></div>
+    <div class="bar"><i style="width:${L.p*100}%"></i></div>
+    <small style="color:#cfe0ff">${L.l>=LEVELS.length-1?"¡Nivel máximo!":"Faltan "+L.need+" XP para «"+LEVELS[L.l+1]+"»"}</small>
+    <div class="row" style="margin-top:12px">
+      <div class="stat"><b>${overall()}%</b><span>Dominio</span></div>
+      <div class="stat"><b>${due}</b><span>Para repasar</span></div>
+      <div class="stat"><b>${nw}</b><span>Nuevas</span></div>
+    </div>
+  </div>
+  <div class="card" style="display:flex;gap:14px;align-items:center">${ring(S.daily.xp/S.goal)}
+    <div style="flex:1"><b>Meta diaria</b><div class="mut" style="font-size:13px">${S.daily.xp} / ${S.goal} XP hoy · Sesiones cortas cada día = memoria a largo plazo</div></div>
+    <button class="btn sm sec" onclick="cycleGoal()">${S.goal}</button></div>
+  ${filterChips()}
+  <div class="grid">
+    <button class="mode hl" onclick="go('smart')"><span class="ic" style="font-size:34px">🚀</span><div><b style="font-size:17px">Entrenamiento inteligente</b><br><small>Mezcla automática de tarjetas, quiz y V/F según lo que más necesitas · 12 min</small></div></button>
+    <button class="mode" onclick="go('srs')"><span class="ic">🃏</span><b>Tarjetas</b><small>Repetición espaciada: recuerda, gira y valora</small></button>
+    <button class="mode" onclick="go('quiz')"><span class="ic">🎯</span><b>Rally Quiz</b><small>10 preguntas · combos · apuesta «Seguro x2»</small></button>
+    <button class="mode" onclick="go('tf')"><span class="ic">⏱️</span><b>Verdadero o Falso</b><small>Contrarreloj de 60 segundos</small></button>
+    <button class="mode" onclick="go('seq')"><span class="ic">🔢</span><b>Ordena</b><small>Fases, modelos, secuencias del manual</small></button>
+    <button class="mode" onclick="go('match')"><span class="ic">🔗</span><b>Parejas</b><small>Une término y definición contra el reloj</small></button>
+    <button class="mode" onclick="go('match3')"><span class="ic">🏟️</span><b>Partido vs Rival</b><small>Tie-break a 7. Si fallas o tardas, punto para él</small></button>
+    <button class="mode" onclick="go('tricks')"><span class="ic">💡</span><b>Trucos de memoria</b><small>Reglas mnemotécnicas por tema</small></button>
+    <button class="mode" onclick="go('stats')"><span class="ic">📊</span><b>Mi progreso</b><small>Dominio por tema, logros y puntos débiles</small></button>
+  </div>
+  <div class="sect">${anyData?"🎯 Tus puntos débiles ahora":"Empieza por aquí"}</div>
+  ${anyData?wk.map(t=>`<div class="weak"><span style="font-size:20px">${TN[t].ic}</span><div style="flex:1"><b>${TN[t].n}</b><br><small class="mut">Dominio ${mastery(t)}% · Acierto ${acc(t)??"–"}%</small></div><button class="btn sm" onclick="drill('${t}')">Entrenar</button></div>`).join("")
+  :`<div class="card"><b>Cómo funciona</b><p class="mut" style="font-size:14px;line-height:1.5;margin:6px 0 0">1) Pulsa <b>Entrenamiento inteligente</b> cada día. 2) El juego detecta qué fallas y te lo vuelve a preguntar justo antes de que lo olvides (repetición espaciada). 3) Mira tu <b>dominio por tema</b> en «Mi progreso». Verde = dominado, amarillo = en camino, rojo = a reforzar.</p></div>`}
+  <p class="center mut" style="font-size:12px;margin-top:20px">Basado en los manuales «Perfeccionamiento técnico y táctico» (Área 2) y «Didáctica para las sesiones de pádel» (Área 3) · ${CARDS.length} preguntas · ${TFS.length} V/F · ${SEQS.length} secuencias</p>`;
+}
+function cycleGoal(){const g=[30,60,100,150];S.goal=g[(g.indexOf(S.goal)+1)%g.length];save();render("home")}
+function drill(t){S.filter=t;save();go("quiz")}
+
+/* ====================== TARJETAS (SRS) ====================== */
+let SR={};
+function srsStart(){SR={list:pickCards(15),i:0,good:0};}
+function srs(){
+  if(!SR.list||SR.done) srsStart();
+  if(SR.i>=SR.list.length){SR.done=true;return endScreen("🃏 Sesión de tarjetas completada",`${SR.good}/${SR.list.length} recordadas`,"srs")}
+  const c=SR.list[SR.i], st=S.cards[c.id];
+  return `${backBtn()}
+  <div class="hud"><div class="prog"><i style="width:${SR.i/SR.list.length*100}%"></i></div><small class="mut">${SR.i+1}/${SR.list.length}</small></div>
+  <div class="flip"><div class="fc" id="fc">
+    <div class="face"><span class="tag">${TN[c.t].ic} ${TN[c.t].n}</span><div class="q" style="margin-top:14px">${esc(c.q)}</div>
+      <div class="hint">🧠 Intenta responder en voz alta ANTES de girar (recuerdo activo).${st?` · Caja ${st.b}/6`:" · Nueva"}</div></div>
+    <div class="face b"><span class="tag">Respuesta</span><div class="q" style="margin-top:10px;color:var(--ball)">${esc(c.a)}</div><div style="font-size:14px;line-height:1.45;color:#dbe7ff">${esc(c.e)}</div></div>
+  </div></div>
+  <div id="srsAct"><button class="btn" onclick="flipC()">Girar tarjeta</button></div>`;
+}
+function flipC(){
+  document.getElementById("fc").classList.add("on");
+  const c=SR.list[SR.i], b=(S.cards[c.id]||{b:0}).b;
+  const nx=g=>{const nb=g===0?0:g===1?Math.max(1,b):g===2?Math.min(6,b+1):Math.min(6,b+2);const ms=INTERVALS[nb];return ms<36e5?Math.round(ms/MIN)+" min":Math.round(ms/DAY)+" d"};
+  document.getElementById("srsAct").innerHTML=`<div class="mut" style="font-size:13px;margin-bottom:8px;text-align:center">¿Qué tal lo recordaste? (sé honesto/a: así el juego sabe cuándo repetir)</div>
+  <div class="rate"><button class="r0" onclick="rateC(0)">No lo sabía<small>${nx(0)}</small></button><button class="r1" onclick="rateC(1)">Dudé<small>${nx(1)}</small></button><button class="r2" onclick="rateC(2)">Bien<small>${nx(2)}</small></button><button class="r3" onclick="rateC(3)">Fácil<small>${nx(3)}</small></button></div>`;
+}
+function rateC(g){
+  const c=SR.list[SR.i];
+  record(c.t,g>=2,c.id,g);
+  addXP([2,5,8,10][g]); if(g>=2)SR.good++;
+  if(g===0) SR.list.push(c); // vuelve a salir al final de la sesión
+  SR.i++; render("srs");
+}
+
+/* ====================== RALLY QUIZ ====================== */
+let QZ={};
+const PTS=["0","15","30","40","Juego"];
+function quizStart(n){QZ={list:pickCards(n||10),i:0,ok:0,combo:0,maxc:0,xp:0,sure:false,answered:false,miss:[]}}
+function quiz(){
+  if(!QZ.list||QZ.done) quizStart();
+  if(QZ.i>=QZ.list.length){QZ.done=true;return quizEnd()}
+  const c=QZ.list[QZ.i]; if(!c.opts) c.opts=shuffle([c.a,...c.d]);
+  const games=Math.floor(QZ.ok/4), pts=PTS[QZ.ok%4];
+  return `${backBtn()}
+  <div class="hud"><div class="prog"><i style="width:${QZ.i/QZ.list.length*100}%"></i></div><span class="combo">${QZ.combo>1?"🔥x"+QZ.combo:""}</span><small class="mut">${QZ.i+1}/${QZ.list.length}</small></div>
+  <div class="row" style="margin-bottom:10px"><div class="stat"><b>${pts}</b><span>Puntos</span></div><div class="stat"><b>${games}</b><span>Juegos</span></div><div class="stat"><b>+${QZ.xp}</b><span>XP</span></div></div>
+  <div class="card"><span class="tag">${TN[c.t].ic} ${TN[c.t].n}</span><div class="q">${esc(c.q)}</div>
+  <div class="conf"><button class="sw ${QZ.sure?"on":""}" onclick="QZ.sure=!QZ.sure;this.classList.toggle('on')" aria-label="Seguro"></button> <span><b style="color:var(--txt)">Estoy seguro/a (x2)</b> — si aciertas doble XP, si fallas pierdes 5. Entrena tu autoconocimiento.</span></div>
+  <div id="opts">${c.opts.map((o,k)=>`<button class="opt" onclick="ans(${k})">${esc(o)}</button>`).join("")}</div>
+  <div id="fb"></div></div>`;
+}
+function ans(k){
+  if(QZ.answered) return; QZ.answered=true;
+  const c=QZ.list[QZ.i], ok=c.opts[k]===c.a;
+  document.querySelectorAll("#opts .opt").forEach((b,j)=>{ if(c.opts[j]===c.a)b.classList.add("ok"); else if(j===k)b.classList.add("ko"); else b.classList.add("dim") });
+  let g=0;
+  if(ok){QZ.ok++;QZ.combo++;QZ.maxc=Math.max(QZ.maxc,QZ.combo);S.best.combo=Math.max(S.best.combo,QZ.combo);g=10+Math.min(QZ.combo-1,5)*2;if(QZ.sure)g*=2}
+  else{QZ.combo=0;g=QZ.sure?-5:0;QZ.miss.push(c)}
+  QZ.xp+=g; addXP(g); record(c.t,ok,c.id,ok?(QZ.sure?3:2):0);
+  document.getElementById("fb").innerHTML=`<div class="exp ${ok?"":"bad"}"><b>${ok?(QZ.sure?"✅ ¡Seguro y correcto! +"+g:"✅ ¡Correcto! +"+g):"❌ "+(QZ.sure?"Estabas seguro/a… −5. ":"")+"Respuesta: "+esc(c.a)}</b><br>${esc(c.e)}</div><button class="btn" onclick="nextQ()">Siguiente →</button>`;
+}
+function nextQ(){const c=QZ.list[QZ.i];delete c.opts;QZ.i++;QZ.answered=false;QZ.sure=false;render("quiz");window.scrollTo(0,0)}
+function quizEnd(){
+  const p=Math.round(100*QZ.ok/QZ.list.length);
+  if(SM.active) return endScreen("🎯 Rally completado",`${QZ.ok}/${QZ.list.length} · +${QZ.xp} XP`,"quiz");
+  return `${backBtn()}<div class="card center"><div style="font-size:48px">${p>=80?"🏆":p>=50?"💪":"📚"}</div><h2>${p>=80?"¡Partidazo!":p>=50?"¡Bien jugado!":"A seguir entrenando"}</h2>
+  <div class="big" style="margin:10px 0">${QZ.ok}/${QZ.list.length}</div><div class="mut">Mejor racha ${QZ.maxc} · +${QZ.xp} XP</div></div>
+  ${QZ.miss.length?`<div class="sect">Repasa tus fallos (volverán pronto)</div>`+QZ.miss.map(c=>`<div class="mn"><b>${esc(c.q)}</b><br>→ ${esc(c.a)}</div>`).join(""):""}
+  <button class="btn" onclick="quizStart();render('quiz')">Otro rally</button><div style="height:8px"></div><button class="btn sec" onclick="go('home')">Inicio</button>`;
+}
+
+/* ====================== VERDADERO / FALSO ====================== */
+let TF={};
+function tfStart(){TF={list:shuffle(TFS.filter(x=>inFilter(x.t))),i:0,ok:0,ko:0,time:60,run:false}; if(TF.list.length<8)TF.list=shuffle(TFS)}
+function tf(){
+  if(!TF.list||TF.done) tfStart();
+  if(!TF.run){return `${backBtn()}<div class="card center"><div style="font-size:48px">⏱️</div><h2>Verdadero o Falso</h2><p class="mut">60 segundos. Cada acierto +1 (y +4 XP), cada fallo −1 punto. ¿Cuántas sacas?</p><p>Récord: <b>${S.best.tf}</b></p><button class="btn" onclick="TF.run=true;tfTick();render('tf')">¡Empezar!</button></div>`}
+  if(TF.time<=0||TF.i>=TF.list.length) return tfEnd();
+  const x=TF.list[TF.i];
+  return `<div class="hud"><button class="back" onclick="go('home')">✕</button><div class="prog"><i style="width:${TF.time/60*100}%"></i></div><span class="timer" id="tm">${TF.time}</span></div>
+  <div class="row" style="margin-bottom:10px"><div class="stat"><b>${TF.ok-TF.ko}</b><span>Puntos</span></div><div class="stat"><b style="color:var(--ok)">${TF.ok}</b><span>Aciertos</span></div><div class="stat"><b style="color:var(--ko)">${TF.ko}</b><span>Fallos</span></div></div>
+  <div class="card" id="tfc"><span class="tag">${TN[x.t].ic} ${TN[x.t].n}</span><div class="q" style="min-height:90px">${esc(x.s)}</div>
+  <div class="tf"><button class="t" onclick="tfA(true)">✔ Verdadero</button><button class="f" onclick="tfA(false)">✘ Falso</button></div><div id="tfb" style="min-height:60px"></div></div>`;
+}
+function tfTick(){clearT();timerId=setInterval(()=>{TF.time--;const e=document.getElementById("tm");if(e)e.textContent=TF.time;if(TF.time<=0){clearT();render("tf")}},1000)}
+function tfA(v){
+  const x=TF.list[TF.i], ok=x.v===v;
+  ok?TF.ok++:TF.ko++; record(x.t,ok); if(ok)addXP(4);
+  TF.i++;
+  if(!ok){ TF.lastBad=x; }
+  render("tf");
+  if(!ok){const b=document.getElementById("tfb"); if(b)b.innerHTML=`<div class="exp bad" style="font-size:13px"><b>Anterior: era ${x.v?"VERDADERO":"FALSO"}.</b> ${esc(x.e)}</div>`; const c=document.getElementById("tfc"); if(c)c.classList.add("shake")}
+}
+function tfEnd(){
+  clearT(); const sc=TF.ok-TF.ko; if(!TF.done){TF.rec=sc>S.best.tf; if(TF.rec)S.best.tf=sc; checkBadges(); save(); TF.done=true;} const rec=TF.rec;
+  if(SM.active) return endScreen("⏱️ ¡Tiempo!",`${sc} puntos · ${TF.ok} aciertos`,"tf");
+  const wrong=TF.list.slice(0,TF.i).filter(x=>false);
+  return `${backBtn()}<div class="card center"><div style="font-size:48px">${rec?"🥇":"⏱️"}</div><h2>${rec?"¡Nuevo récord!":"¡Tiempo!"}</h2><div class="big" style="margin:10px 0">${sc}</div><div class="mut">${TF.ok} aciertos · ${TF.ko} fallos · Récord ${S.best.tf}</div></div>
+  <button class="btn" onclick="tfStart();TF.run=true;tfTick();render('tf')">Revancha</button><div style="height:8px"></div><button class="btn sec" onclick="go('home')">Inicio</button>`;
+}
+
+/* ====================== ORDENA ====================== */
+let SQ={};
+function seqStart(){const pool=SEQS.filter(s=>inFilter(s.t));const L=shuffle(pool.length?pool:SEQS);SQ={list:L.slice(0,4),i:0,mist:0,tot:0,start:true};seqLoad()}
+function seqLoad(){const s=SQ.list[SQ.i];SQ.cur={s,sh:shuffle(s.it.map((x,k)=>({x,k}))),next:0,err:0}}
+function seq(){
+  if(!SQ.list||SQ.done) seqStart();
+  if(SQ.i>=SQ.list.length){SQ.done=true;const p=Math.max(0,100-SQ.mist*8);return endScreen("🔢 ¡Secuencias completadas!",`${SQ.mist} fallos · precisión ${p}%`,"seq")}
+  const {s,sh,next}=SQ.cur;
+  return `${backBtn()}<div class="hud"><div class="prog"><i style="width:${SQ.i/SQ.list.length*100}%"></i></div><small class="mut">${SQ.i+1}/${SQ.list.length}</small></div>
+  <div class="card"><span class="tag">${TN[s.t].ic} ${TN[s.t].n}</span><div class="q">Ordena: <b>${esc(s.n)}</b></div><div class="mut" style="font-size:13px;margin-bottom:10px">Toca los elementos en el orden correcto.</div>
+  <div id="sq">${sh.map((o,j)=>`<button class="seqi ${o.k<next?"done":""}" onclick="seqT(${j},this)"><span class="n">${o.k<next?o.k+1:"?"}</span>${esc(o.x)}</button>`).join("")}</div></div>`;
+}
+function seqT(j,el){
+  const C=SQ.cur,o=C.sh[j]; if(o.k<C.next) return;
+  if(o.k===C.next){C.next++; if(C.next===C.sh.length){const ok=C.err===0;record(C.s.t,ok);addXP(ok?15:6);toast(ok?"✅ ¡Perfecto! +15":"👍 Completado +6");SQ.i++;if(SQ.i<SQ.list.length)seqLoad();render("seq");return} render("seq")}
+  else{C.err++;SQ.mist++;el.classList.add("shake");setTimeout(()=>el.classList.remove("shake"),400)}
+}
+
+/* ====================== PAREJAS ====================== */
+let MT={};
+function matchStart(){
+  let pool=PAIRS.filter(p=>inFilter(p[0])); if(pool.length<6)pool=PAIRS;
+  const sel=shuffle(pool).slice(0,6);
+  MT={sel,left:shuffle(sel.map((p,i)=>({i,x:p[1]}))),right:shuffle(sel.map((p,i)=>({i,x:p[2]}))),gone:[],pick:null,err:0,t0:Date.now(),done:false};
+}
+function match(){
+  if(!MT.sel||MT.done) matchStart();
+  if(MT.gone.length===MT.sel.length){
+    const s=Math.round((Date.now()-MT.t0)/1000); const sc=Math.max(10,100-s*2-MT.err*5);
+    if(!MT.fin){MT.fin=true;addXP(Math.round(sc/5));if(sc>S.best.match)S.best.match=sc;save()}
+    MT.done=true; return endScreen("🔗 ¡Todas unidas!",`${s} s · ${MT.err} fallos · ${sc} puntos (récord ${S.best.match})`,"match");
+  }
+  const cell=(o,side)=>`<button class="mt ${MT.gone.includes(o.i)?"gone":""} ${MT.pick&&MT.pick.side===side&&MT.pick.i===o.i?"sel":""}" onclick="mtT('${side}',${o.i},this)">${esc(o.x)}</button>`;
+  return `${backBtn()}<div class="card"><div class="q" style="margin-top:0">Une cada término con su definición</div>
+  <div class="mgrid"><div style="display:grid;gap:8px">${MT.left.map(o=>cell(o,"L")).join("")}</div><div style="display:grid;gap:8px">${MT.right.map(o=>cell(o,"R")).join("")}</div></div></div>`;
+}
+function mtT(side,i,el){
+  if(!MT.pick||MT.pick.side===side){MT.pick={side,i};render("match");return}
+  const p=MT.sel[i];
+  if(MT.pick.i===i){MT.gone.push(i);record(p[0],true);MT.pick=null;render("match")}
+  else{MT.err++;record(MT.sel[MT.pick.i][0],false);MT.pick=null;el.classList.add("bad","shake");setTimeout(()=>render("match"),450)}
+}
+
+/* ====================== PARTIDO VS RIVAL ====================== */
+let PM={};
+function pmStart(){PM={me:0,rv:0,q:null,t:20,lock:false,serve:0};pmNext()}
+function pmNext(){
+  PM.lock=false; PM.t=20;
+  if(Math.random()<.3){const pool=TFS.filter(x=>inFilter(x.t));const x=shuffle(pool.length?pool:TFS)[0];PM.q={type:"tf",x}}
+  else{const c=pickCards(1)[0]||shuffle(CARDS)[0];PM.q={type:"mc",c,opts:shuffle([c.a,...c.d])}}
+}
+function pmOver(){const a=PM.me,b=PM.rv;return (a>=7||b>=7)&&Math.abs(a-b)>=2}
+function match3(){
+  if(!PM.q||PM.end) pmStart();
+  if(pmOver()) return pmEnd();
+  const q=PM.q; const t=q.type==="tf"?q.x.t:q.c.t;
+  const body=q.type==="tf"
+   ? `<div class="q">${esc(q.x.s)}</div><div class="tf" id="pmo"><button class="t" onclick="pmA(true)">✔ Verdadero</button><button class="f" onclick="pmA(false)">✘ Falso</button></div>`
+   : `<div class="q">${esc(q.c.q)}</div><div id="pmo">${q.opts.map((o,k)=>`<button class="opt" onclick="pmA(${k})">${esc(o)}</button>`).join("")}</div>`;
+  setTimeout(pmTick,0);
+  return `<div class="hud"><button class="back" onclick="go('home')">✕ Abandonar</button><div class="spacer"></div><span class="timer" id="pmt">${PM.t}</span></div>
+  <div class="score"><div class="sc"><b>${PM.me}</b><small>Tú 🎾</small></div><span class="vs">TIE-BREAK</span><div class="sc"><b>${PM.rv}</b><small>Rival 🤖</small></div></div>
+  <div class="card"><span class="tag">${TN[t].ic} ${TN[t].n}</span>${body}<div id="pmf"></div></div>`;
+}
+function pmTick(){clearT();timerId=setInterval(()=>{PM.t--;const e=document.getElementById("pmt");if(e)e.textContent=PM.t;if(PM.t<=0){clearT();pmA(null)}},1000)}
+function pmA(v){
+  if(PM.lock) return; PM.lock=true; clearT();
+  const q=PM.q; let ok, right, exp, t;
+  if(q.type==="tf"){ok=v===q.x.v;right=q.x.v?"VERDADERO":"FALSO";exp=q.x.e;t=q.x.t;record(t,ok);
+    document.querySelectorAll("#pmo button").forEach(b=>{b.disabled=true})}
+  else{ok=v!==null&&q.opts[v]===q.c.a;right=q.c.a;exp=q.c.e;t=q.c.t;record(t,ok,q.c.id);
+    document.querySelectorAll("#pmo .opt").forEach((b,j)=>{if(q.opts[j]===q.c.a)b.classList.add("ok");else if(j===v)b.classList.add("ko");else b.classList.add("dim")})}
+  if(ok){PM.me++;addXP(8)}else PM.rv++;
+  document.getElementById("pmf").innerHTML=`<div class="exp ${ok?"":"bad"}"><b>${ok?"✅ ¡Punto para ti!":v===null?"⌛ Tiempo — punto del rival. ":"❌ Punto del rival. "}${ok?"":"Correcto: "+esc(right)}</b><br>${esc(exp)}</div><button class="btn" onclick="pmNext();render('match3')">${pmOver()?"Ver resultado":"Siguiente punto →"}</button>`;
+}
+function pmEnd(){
+  const win=PM.me>PM.rv; if(!PM.end){PM.end=true;if(win){S.wins++;addXP(40)}checkBadges();save()}
+  return `${backBtn()}<div class="card center hero"><div style="font-size:56px">${win?"🏆":"🤖"}</div><h2>${win?"¡GANASTE EL TIE-BREAK!":"El Rival se lleva el partido"}</h2>
+  <div class="big" style="margin:10px 0">${PM.me} – ${PM.rv}</div><div style="color:#cfe0ff">${win?"+40 XP de bonus · Partidos ganados: "+S.wins:"Revisa tus puntos débiles y pide la revancha"}</div></div>
+  <button class="btn" onclick="PM={};go('match3')">Revancha</button><div style="height:8px"></div><button class="btn sec" onclick="go('stats')">Ver mis puntos débiles</button>`;
+}
+
+/* ====================== ENTRENAMIENTO INTELIGENTE ====================== */
+// Bloques intercalados: tarjetas → quiz → V/F → secuencia
+let SM={};
+function smart(){
+  if(!SM.step||SM.step>4){SM={step:1}}
+  const steps=[
+    ["🃏","Calentamiento: 8 tarjetas","Recuerdo activo con repetición espaciada","srs8"],
+    ["🎯","Parte técnica: Rally de 8 preguntas","Prioriza tus fallos y lo que está por vencer","quiz8"],
+    ["⏱️","Parte táctica: V/F 60 s","Velocidad de recuperación de la memoria","tf"],
+    ["🔢","Vuelta a la calma: ordena 2 secuencias","Estructura y orden de los procesos","seq2"]
+  ];
+  return `${backBtn()}<div class="card hero"><h2>🚀 Entrenamiento inteligente</h2><p style="color:#cfe0ff;font-size:14px;line-height:1.5;margin:8px 0 0">Una «sesión» de 4 partes como la del manual (calentamiento, técnica, táctica, vuelta a la calma), pero para tu cerebro: recuerdo activo, intercalado de temas y repetición espaciada.</p></div>
+  ${steps.map((s,i)=>`<div class="card" style="display:flex;gap:12px;align-items:center;${i+1<SM.step?"opacity:.5":""}"><span style="font-size:28px">${i+1<SM.step?"✅":s[0]}</span><div style="flex:1"><b>${s[1]}</b><br><small class="mut">${s[2]}</small></div>${i+1===SM.step?`<button class="btn sm" onclick="smGo('${s[3]}')">Ir</button>`:""}</div>`).join("")}
+  ${SM.step>4?"":""}`;
+}
+function smGo(k){
+  SM.active=true;
+  if(k==="srs8"){SR={list:pickCards(8),i:0,good:0};go("srs")}
+  if(k==="quiz8"){quizStart(8);go("quiz")}
+  if(k==="tf"){tfStart();go("tf")}
+  if(k==="seq2"){seqStart();SQ.list=SQ.list.slice(0,2);go("seq")}
+}
+function endScreen(title,sub,again){
+  if(SM.active){SM.step++;SM.active=false;save();
+    if(SM.step>4){addXP(30);SM.step=0;return `<div class="card center hero"><div style="font-size:56px">🏅</div><h2>¡Sesión completa!</h2><p style="color:#cfe0ff">+30 XP de bonus. Vuelve mañana: la repetición espaciada hará que lo de hoy se quede para siempre.</p></div><button class="btn" onclick="go('stats')">Ver mi progreso</button><div style="height:8px"></div><button class="btn sec" onclick="go('home')">Inicio</button>`}
+    return `<div class="card center"><h2>${title}</h2><p class="mut">${sub}</p></div><button class="btn" onclick="go('smart')">Siguiente parte →</button>`;
+  }
+  return `${backBtn()}<div class="card center"><div style="font-size:48px">🎉</div><h2>${title}</h2><p class="mut">${sub}</p></div>
+  <button class="btn" onclick="resetMode('${again}')">Otra vez</button><div style="height:8px"></div><button class="btn sec" onclick="go('home')">Inicio</button>`;
+}
+function resetMode(m){if(m==="srs")SR={};if(m==="seq")SQ={};if(m==="match")MT={};go(m);render(m)}
+
+/* ====================== TRUCOS ====================== */
+function tricks(){
+  return `${backBtn()}<h2 style="margin:6px 0 12px">💡 Trucos de memoria</h2>
+  <p class="mut" style="font-size:14px;margin-top:0">Léelos, cierra los ojos e intenta repetirlos. Luego compruébalo en Rally Quiz.</p>
+  ${TOPICS.map(t=>{const ms=MNEMO.filter(m=>m[0]===t.id);if(!ms.length)return"";return `<div class="sect">${t.ic} ${t.n} <span style="opacity:.6">· Área ${t.a}</span></div>${ms.map(m=>`<div class="mn">${m[1]}</div>`).join("")}`}).join("")}`;
+}
+
+/* ====================== PROGRESO ====================== */
+function stats(){
+  const L=levelOf(S.xp);
+  const rows=a=>TOPICS.filter(t=>t.a===a).map(t=>{const m=mastery(t.id),ac=acc(t.id);return `<div class="tbar"><span style="font-size:18px">${t.ic}</span><div class="nm">${t.n}<small>Acierto ${ac===null?"–":ac+"%"} · ${CARDS.filter(c=>c.t===t.id).length} preguntas</small></div><div class="mini"><i style="width:${m}%;background:${colorFor(m)}"></i></div><span class="pc" style="color:${colorFor(m)}">${m}%</span></div>`}).join("");
+  return `${backBtn()}<h2 style="margin:6px 0 12px">📊 Mi progreso</h2>
+  <div class="card"><div class="row"><div class="stat"><b>${overall()}%</b><span>Dominio global</span></div><div class="stat"><b>${S.answered}</b><span>Respuestas</span></div><div class="stat"><b>${S.wins}</b><span>Partidos ganados</span></div></div>
+  <div class="row" style="margin-top:8px"><div class="stat"><b>${S.best.combo}</b><span>Mejor racha</span></div><div class="stat"><b>${S.best.tf}</b><span>Récord V/F</span></div><div class="stat"><b>${S.streak.n}</b><span>Días seguidos</span></div></div></div>
+  <div class="mut" style="font-size:12px;margin:0 4px 8px">Dominio = lo bien asentado en tu memoria a largo plazo (repetición espaciada). <span style="color:var(--ok)">■ ≥75%</span> <span style="color:var(--warn)">■ 45-74%</span> <span style="color:var(--ko)">■ &lt;45%</span></div>
+  <div class="sect">📘 Área 2 · Técnica y táctica</div><div class="card">${rows(2)}</div>
+  <div class="sect">📗 Área 3 · Didáctica</div><div class="card">${rows(3)}</div>
+  <div class="sect">🏅 Logros (${S.badges.length}/${BADGES.length})</div><div class="card">${BADGES.map(b=>`<div class="badge ${S.badges.includes(b[0])?"":"off"}"><span class="bi">${b[1]}</span><div><b>${b[2]}</b><small>${b[3]}</small></div></div>`).join("")}</div>
+  <div class="sect">Ajustes</div><div class="card"><div class="mut" style="font-size:13px;margin-bottom:8px">Tu progreso se guarda en este navegador y dispositivo.</div><button class="btn sec" id="rst" onclick="rst()">Reiniciar progreso</button></div>`;
+}
+function rst(){const b=document.getElementById("rst");if(b.dataset.c){S=fresh();save();toast("Progreso reiniciado");render("home");location.hash=""}else{b.dataset.c=1;b.textContent="Toca otra vez para confirmar";b.style.borderColor="var(--ko)"}}
+
+/* ====================== ROUTER ====================== */
+const VIEWS={home,srs,quiz,tf,seq,match,match3,tricks,stats,smart};
+function render(v){
+  v=v||"home"; if(!VIEWS[v]) v="home";
+  if(v!=="tf"&&v!=="match3") clearT();
+  $app.innerHTML=VIEWS[v]();
+}
+load(); touchDay(); save();
+render(location.hash.slice(1)||"home");
+</script>
+</body>
+</html>
